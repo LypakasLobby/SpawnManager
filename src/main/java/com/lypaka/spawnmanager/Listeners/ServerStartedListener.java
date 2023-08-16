@@ -1,7 +1,6 @@
 package com.lypaka.spawnmanager.Listeners;
 
 import com.lypaka.spawnmanager.ConfigGetters;
-import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnManager;
 import com.lypaka.spawnmanager.Spawners.*;
 import com.pixelmonmod.pixelmon.Pixelmon;
@@ -10,9 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 

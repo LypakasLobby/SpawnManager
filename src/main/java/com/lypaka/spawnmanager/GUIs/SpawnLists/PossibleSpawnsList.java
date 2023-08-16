@@ -1,9 +1,9 @@
 package com.lypaka.spawnmanager.GUIs.SpawnLists;
 
+import com.lypaka.lypakautils.FancyText;
 import com.lypaka.spawnmanager.ConfigGetters;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.*;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.lypaka.lypakautils.FancyText;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
 import com.pixelmonmod.pixelmon.api.util.helpers.SpriteItemHelper;

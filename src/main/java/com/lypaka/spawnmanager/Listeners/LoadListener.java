@@ -1,6 +1,6 @@
 package com.lypaka.spawnmanager.Listeners;
 
-import com.lypaka.areamanager.API.AreasLoadedEvent;
+import com.lypaka.areamanager.API.FinishedLoadingEvent;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnManager;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class LoadListener {
 
     @SubscribeEvent
-    public static void onAreaLoad (AreasLoadedEvent event) throws IOException, ObjectMappingException {
+    public static void onAreaLoad (FinishedLoadingEvent event) throws IOException, ObjectMappingException {
 
         SpawnAreaHandler.loadAreas();
 
