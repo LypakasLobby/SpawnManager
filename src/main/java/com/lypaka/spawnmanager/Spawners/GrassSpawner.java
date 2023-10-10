@@ -5,6 +5,7 @@ import com.lypaka.areamanager.Areas.AreaHandler;
 import com.lypaka.lypakautils.API.PlayerMovementEvent;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.spawnmanager.API.AreaGrassSpawnEvent;
+import com.lypaka.spawnmanager.Listeners.TickListener;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
@@ -29,10 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GrassSpawner {
 
@@ -44,7 +42,7 @@ public class GrassSpawner {
         ServerPlayerEntity player = event.getPlayer();
         if (!player.isCreative() && !player.isSpectator()) {
 
-
+            if (TickListener.timeBetweenGrassSpawns.containsKey(player.getUniqueID())) return;
             int x = player.getPosition().getX();
             int y = player.getPosition().getY();
             int z = player.getPosition().getZ();

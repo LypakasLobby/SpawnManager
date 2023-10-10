@@ -24,6 +24,7 @@ public class ServerStartedListener {
         MinecraftForge.EVENT_BUS.register(new AreaListener());
         MinecraftForge.EVENT_BUS.register(new GrassSpawner());
         MinecraftForge.EVENT_BUS.register(new SurfSpawner());
+        MinecraftForge.EVENT_BUS.register(new TickListener());
 
         Pixelmon.EVENT_BUS.register(new BattleEndListener());
         Pixelmon.EVENT_BUS.register(new FishSpawner());
