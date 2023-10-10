@@ -43,6 +43,7 @@ public class GrassSpawner {
         if (!player.isCreative() && !player.isSpectator()) {
 
             if (TickListener.timeBetweenGrassSpawns.containsKey(player.getUniqueID())) return;
+            TickListener.timeBetweenGrassSpawns.put(player.getUniqueID(), 0);
             int x = player.getPosition().getX();
             int y = player.getPosition().getY();
             int z = player.getPosition().getZ();
@@ -124,6 +125,10 @@ public class GrassSpawner {
                                     break;
 
                                 }
+
+                            } else {
+
+                                break;
 
                             }
 
