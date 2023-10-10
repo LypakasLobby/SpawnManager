@@ -82,6 +82,7 @@ public class NaturalSpawner {
                             }
                             for (UUID uuid : entry.getValue()) {
 
+                                if (uuid == null) continue;
                                 ServerPlayerEntity player = JoinListener.playerMap.get(uuid);
                                 int x = player.getPosition().getX();
                                 int y = player.getPosition().getY();
