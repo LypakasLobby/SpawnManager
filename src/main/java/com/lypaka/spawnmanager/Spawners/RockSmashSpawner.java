@@ -46,6 +46,7 @@ public class RockSmashSpawner {
     public void onPokeBallHit (PokeBallImpactEvent event) {
 
         UUID uuid = event.getPokeBall().getOwnerId();
+        if (!JoinListener.playerMap.containsKey(uuid)) return;
         ServerPlayerEntity player = JoinListener.playerMap.get(uuid);
         int x = player.getPosition().getX();
         int y = player.getPosition().getY();
