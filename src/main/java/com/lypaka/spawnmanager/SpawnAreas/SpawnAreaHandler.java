@@ -24,9 +24,11 @@ public class SpawnAreaHandler {
 
     public static Map<Area, SpawnArea> areaMap = new HashMap<>();
     public static Map<SpawnArea, AreaSpawns> areaSpawnMap = new HashMap<>();
+    public static int areasWithNaturalSpawns = 0;
 
     public static void loadAreas() throws IOException, ObjectMappingException {
 
+        areasWithNaturalSpawns = 0;
         String[] files = new String[]{"settings.conf"};
         for (Map.Entry<String, Region> regionMap : RegionHandler.regionMap.entrySet()) {
 
@@ -164,6 +166,12 @@ public class SpawnAreaHandler {
                     Map<String, Map<String, Map<String, String>>> spawnData = ncm.getConfigNode(i, "Spawn-Data").getValue(new TypeToken<Map<String, Map<String, Map<String, String>>>>() {});
                     NaturalSpawn naturalSpawn = new NaturalSpawn(species, form, minLevel, maxLevel, spawnData);
                     naturalSpawnsList.add(naturalSpawn);
+
+                }
+
+                if (naturalSpawnsList.size() > 0) {
+
+                    areasWithNaturalSpawns++;
 
                 }
 

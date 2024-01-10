@@ -41,6 +41,7 @@ public class NaturalSpawner {
 
     public static void startTimer() {
 
+        if (SpawnAreaHandler.areasWithNaturalSpawns == 0) return;
         if (timer != null) {
 
             timer.cancel();
