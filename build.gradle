@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 
 
 group = 'com.lypaka'
-version = '1.16.5-1.0.2'
+version = '1.16.5-1.0.3'
 
 java {
     archivesBaseName = 'SpawnManager'

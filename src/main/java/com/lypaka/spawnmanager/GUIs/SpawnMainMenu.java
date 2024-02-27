@@ -10,6 +10,7 @@ import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.lypakautils.MiscHandlers.ItemStackBuilder;
 import com.lypaka.spawnmanager.ConfigGetters;
+import com.lypaka.spawnmanager.SpawnManager;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ListNBT;
@@ -56,7 +57,7 @@ public class SpawnMainMenu {
                 }
                 if (data.containsKey("Lore")) {
 
-                    List<String> displayLore = AreaManager.configManager.getConfigNode(2, "Spawn-Main-Menu", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
+                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawn-Main-Menu", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
                     ListNBT lore = new ListNBT();
 
 

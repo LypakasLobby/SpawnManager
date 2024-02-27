@@ -13,6 +13,7 @@ import com.lypaka.spawnmanager.ConfigGetters;
 import com.lypaka.spawnmanager.GUIs.SpawnLists.AllSpawnsList;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
+import com.lypaka.spawnmanager.SpawnManager;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -128,7 +129,7 @@ public class AllSpawnsMenu {
                 }
                 if (data.containsKey("Lore")) {
 
-                    List<String> displayLore = AreaManager.configManager.getConfigNode(2, "Spawns-All", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
+                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-All", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
                     ListNBT lore = new ListNBT();
                     List<String> subAreas = new ArrayList<>();
                     for (Area a : areas) {
@@ -194,7 +195,7 @@ public class AllSpawnsMenu {
 
         if (this.spawnsMap.size() >= usable) {
 
-            Map<String, Map<String, String>> utilityMap = AreaManager.configManager.getConfigNode(2, "Spawns-All", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
+            Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(2, "Spawns-All", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
             String nextPageID = utilityMap.get("Next-Page").get("ID");
             ItemStack next = ItemStackBuilder.buildFromStringID(nextPageID);
             next.setDisplayName(FancyText.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
@@ -270,7 +271,7 @@ public class AllSpawnsMenu {
                 }
                 if (data.containsKey("Lore")) {
 
-                    List<String> displayLore = AreaManager.configManager.getConfigNode(2, "Spawns-All", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
+                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-All", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
                     ListNBT lore = new ListNBT();
                     List<String> subAreas = new ArrayList<>();
                     for (Area a : areas) {
@@ -339,7 +340,7 @@ public class AllSpawnsMenu {
 
         }
 
-        Map<String, Map<String, String>> utilityMap = AreaManager.configManager.getConfigNode(2, "Spawns-All", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
+        Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(2, "Spawns-All", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
         if (currentIndex >= maxIndex) {
 
             String nextPageID = utilityMap.get("Next-Page").get("ID");
