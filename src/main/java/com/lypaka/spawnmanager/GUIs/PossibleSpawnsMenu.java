@@ -11,6 +11,7 @@ import com.lypaka.lypakautils.FancyText;
 import com.lypaka.lypakautils.MiscHandlers.ItemStackBuilder;
 import com.lypaka.spawnmanager.ConfigGetters;
 import com.lypaka.spawnmanager.GUIs.SpawnLists.PossibleSpawnsList;
+import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnManager;
@@ -75,7 +76,7 @@ public class PossibleSpawnsMenu {
             if (blockID.equalsIgnoreCase("air")) location = "air";
             if (blockID.contains("water") || blockID.contains("lava")) location = "water";
             if (this.player.getPosition().getY() <= a.getUnderground()) location = "underground";
-            AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(a);
+            AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(SpawnAreaHandler.areaMap.get(a));
 
             if (spawns.getNaturalSpawns().size() > 0) {
 

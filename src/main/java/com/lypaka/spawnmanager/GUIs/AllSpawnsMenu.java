@@ -45,7 +45,7 @@ public class AllSpawnsMenu {
         Map<Integer, UUID> m3 = new HashMap<>();
         for (Area a : this.areas) {
 
-            AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(a);
+            AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(SpawnAreaHandler.areaMap.get(a));
 
             if (spawns.getNaturalSpawns().size() > 0) {
 

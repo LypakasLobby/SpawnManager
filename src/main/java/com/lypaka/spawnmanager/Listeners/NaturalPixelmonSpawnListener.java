@@ -4,7 +4,9 @@ import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Areas.AreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
+import com.lypaka.spawnmanager.Spawners.FishSpawner;
 import com.pixelmonmod.pixelmon.api.events.spawning.SpawnEvent;
+import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -24,7 +26,23 @@ public class NaturalPixelmonSpawnListener {
         for (Area area : areas) {
 
             SpawnArea spawnArea = SpawnAreaHandler.areaMap.get(area);
-            if (spawnArea.getNaturalSpawnerSettings().doesPreventPixelmonSpawns()) event.setCanceled(true);
+            if (event.action.getOrCreateEntity() instanceof PixelmonEntity) {
+
+                PixelmonEntity pixelmon = (PixelmonEntity) event.action.getOrCreateEntity();
+                if (!FishSpawner.fishSpawnerMap.containsKey(pixelmon.getUniqueID())) {
+
+                    if (spawnArea.getNaturalSpawnerSettings().doesPreventPixelmonSpawns()) {
+
+                        event.setCanceled(true);
+                        return;
+
+                    }
+
+                }
+
+                FishSpawner.fishSpawnerMap.entrySet().removeIf(e -> e.getKey().toString().equalsIgnoreCase(pixelmon.getUniqueID().toString()));
+
+            }
 
         }
 

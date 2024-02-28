@@ -10,6 +10,7 @@ import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
 import com.lypaka.spawnmanager.Utils.SpawnBuilder;
+import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.events.FishingEvent;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
@@ -28,6 +29,7 @@ public class FishSpawner {
 
     public static List<UUID> spawnedPokemonUUIDs = new ArrayList<>();
     public static Map<Area, Map<UUID, List<PixelmonEntity>>> pokemonSpawnedMap = new HashMap<>();
+    public static Map<UUID, Pokemon> fishSpawnerMap = new HashMap<>();
 
     @SubscribeEvent
     public void onCast (FishingEvent.Cast event) {
@@ -62,6 +64,19 @@ public class FishSpawner {
     }
 
     @SubscribeEvent
+    public void onCatch (FishingEvent.Catch event) {
+
+        if (event.plannedSpawn.getOrCreateEntity() instanceof PixelmonEntity) {
+
+            PixelmonEntity pixelmon = (PixelmonEntity) event.plannedSpawn.getOrCreateEntity();
+            UUID uuid = pixelmon.getUniqueID();
+            fishSpawnerMap.put(uuid, pixelmon.getPokemon());
+
+        }
+
+    }
+
+    @SubscribeEvent
     public void onFish (FishingEvent.Reel event) {
 
         if (event.isPokemon()) {
@@ -73,20 +88,7 @@ public class FishSpawner {
             World world = player.world;
             List<Area> areas = AreaHandler.getSortedAreas(x, y, z, world);
             if (areas.size() == 0) return;
-            String rod = event.getRodType().name();
-            if (rod.contains("old")) {
-
-                rod = "Old";
-
-            } else if (rod.contains("good")) {
-
-                rod = "Good";
-
-            } else if (rod.contains("super")) {
-
-                rod = "Super";
-
-            }
+            String rod = event.getRodType().name().replace("Rod", "");
             String time = "Night";
             List<WorldTime> times = WorldTime.getCurrent(world);
             for (WorldTime t : times) {
