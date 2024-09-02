@@ -10,6 +10,7 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
+import com.lypaka.spawnmanager.SpawnManager;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
 import com.lypaka.spawnmanager.Utils.SpawnBuilder;
@@ -56,6 +57,7 @@ public class NaturalSpawner {
 
                 for (Map.Entry<String, Map<Area, List<UUID>>> map : AreaHandler.playersInArea.entrySet()) {
 
+                    String key = map.getKey();
                     Map<Area, List<UUID>> map2 = map.getValue();
                     for (Map.Entry<Area, List<UUID>> entry : map2.entrySet()) {
 
@@ -93,7 +95,7 @@ public class NaturalSpawner {
                                 List<WorldTime> times = WorldTime.getCurrent(world);
                                 for (WorldTime t : times) {
 
-                                    if (t.name().contains("day") || t.name().contains("dawn") || t.name().contains("morning") || t.name().contains("afternoon")) {
+                                    if (t.name().contains("DAY") || t.name().contains("DAWN") || t.name().contains("MORNING") || t.name().contains("AFTERNOON")) {
 
                                         time = "Day";
                                         break;
@@ -313,9 +315,12 @@ public class NaturalSpawner {
 
                                                 }
                                                 Pokemon finalPoke = poke;
+                                                int finalSpawnX = spawnX;
+                                                int finalSpawnZ = spawnZ;
                                                 player.world.getServer().deferTask(() -> {
 
                                                     pixelmon.setSpawnLocation(pixelmon.getDefaultSpawnLocation());
+                                                    pixelmon.setPosition(finalSpawnX, spawnY + 1.5, finalSpawnZ);
                                                     player.world.addEntity(pixelmon);
                                                     if (currentSpawnArea.getNaturalSpawnerSettings().doesDespawnAfterBattle()) {
 

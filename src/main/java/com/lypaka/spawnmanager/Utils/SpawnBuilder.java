@@ -1,6 +1,8 @@
 package com.lypaka.spawnmanager.Utils;
 
+import com.lypaka.lypakautils.MiscHandlers.PixelmonHelpers;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.*;
+import com.lypaka.spawnmanager.SpawnManager;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
 import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
@@ -115,7 +117,7 @@ public class SpawnBuilder {
     public static Map<Pokemon, Double> buildRockSmashSpawns (String time, String weather, String blockID, AreaSpawns spawns, double modifier) {
 
         List<RockSmashSpawn> rockSmashSpawns = spawns.getRockSmashSpawns();
-        Map<Double, RockSmashSpawn> map = new HashMap<>();
+        Map<Double, List<RockSmashSpawn>> map = new HashMap<>();
         Map<Pokemon, Double> pokemonMap = new HashMap<>();
         if (rockSmashSpawns.size() == 0) return pokemonMap;
         for (RockSmashSpawn h : rockSmashSpawns) {
@@ -157,10 +159,12 @@ public class SpawnBuilder {
                 stoneTypes = data.get("Stone-Types");
 
             }
-            double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            double spawnChance = Double.parseDouble(data.get("Spawn-Chance")) * modifier;
+            List<RockSmashSpawn> list = new ArrayList<>();
+            if (map.containsKey(spawnChance)) list = map.get(spawnChance);
             if (stoneTypes.equalsIgnoreCase("Any")) {
 
-                map.put(spawnChance * modifier, h);
+                list.add(h);
 
             } else {
 
@@ -171,7 +175,7 @@ public class SpawnBuilder {
 
                         if (s.equalsIgnoreCase(blockID)) {
 
-                            map.put(spawnChance * modifier, h);
+                            list.add(h);
                             break;
 
                         }
@@ -182,13 +186,14 @@ public class SpawnBuilder {
 
                     if (stoneTypes.equalsIgnoreCase(blockID)) {
 
-                        map.put(spawnChance * modifier, h);
+                        list.add(h);
 
                     }
 
                 }
 
             }
+            map.put(spawnChance, list);
 
         }
 
@@ -197,16 +202,20 @@ public class SpawnBuilder {
 
         for (int i = chances.size() - 1; i >= 0; i--) {
 
-            RockSmashSpawn spawn = map.get(chances.get(i));
-            int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-            Pokemon pokemon = PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build();
-            if (!spawn.getForm().equalsIgnoreCase("")) {
+            List<RockSmashSpawn> spawnList = map.get(chances.get(i));
+            for (RockSmashSpawn spawn : spawnList) {
 
-                pokemon.setForm(spawn.getForm());
+                int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
+                Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+                if (!spawn.getForm().equalsIgnoreCase("")) {
+
+                    pokemon.setForm(spawn.getForm());
+
+                }
+
+                pokemonMap.put(pokemon, chances.get(i));
 
             }
-
-            pokemonMap.put(pokemon, chances.get(i));
 
         }
 
@@ -320,7 +329,7 @@ public class SpawnBuilder {
     public static Map<Pokemon, Double> buildHeadbuttSpawns (String time, String weather, String blockID, AreaSpawns spawns, double modifier) {
 
         List<HeadbuttSpawn> headbuttSpawns = spawns.getHeadbuttSpawns();
-        Map<Double, HeadbuttSpawn> map = new HashMap<>();
+        Map<Double, List<HeadbuttSpawn>> map = new HashMap<>();
         Map<Pokemon, Double> pokemonMap = new HashMap<>();
         if (headbuttSpawns.size() == 0) return pokemonMap;
         for (HeadbuttSpawn h : headbuttSpawns) {
@@ -363,9 +372,13 @@ public class SpawnBuilder {
 
             }
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            spawnChance = spawnChance * modifier;
+            List<HeadbuttSpawn> list = new ArrayList<>();
+            if (map.containsKey(spawnChance)) list = map.get(spawnChance);
+
             if (woodTypes.equalsIgnoreCase("Any")) {
 
-                map.put(spawnChance * modifier, h);
+                list.add(h);
 
             } else {
 
@@ -376,7 +389,7 @@ public class SpawnBuilder {
 
                         if (s.equalsIgnoreCase(blockID)) {
 
-                            map.put(spawnChance * modifier, h);
+                            list.add(h);
                             break;
 
                         }
@@ -387,13 +400,14 @@ public class SpawnBuilder {
 
                     if (woodTypes.equalsIgnoreCase(blockID)) {
 
-                        map.put(spawnChance * modifier, h);
+                        list.add(h);
 
                     }
 
                 }
 
             }
+            map.put(spawnChance, list);
 
         }
 
@@ -402,16 +416,20 @@ public class SpawnBuilder {
 
         for (int i = chances.size() - 1; i >= 0; i--) {
 
-            HeadbuttSpawn spawn = map.get(chances.get(i));
-            int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-            Pokemon pokemon = PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build();
-            if (!spawn.getForm().equalsIgnoreCase("")) {
+            List<HeadbuttSpawn> spawnList = map.get(chances.get(i));
+            for (HeadbuttSpawn spawn : spawnList) {
 
-                pokemon.setForm(spawn.getForm());
+                int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
+                Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+                if (!spawn.getForm().equalsIgnoreCase("")) {
+
+                    pokemon.setForm(spawn.getForm());
+
+                }
+
+                pokemonMap.put(pokemon, chances.get(i));
 
             }
-
-            pokemonMap.put(pokemon, chances.get(i));
 
         }
 
@@ -425,52 +443,6 @@ public class SpawnBuilder {
         Map<Pokemon, PokemonSpawn> pokemonMap = new HashMap<>();
         if (fishSpawns.size() == 0) return pokemonMap;
         for (FishSpawn f : fishSpawns) {
-
-            Map<String, Map<String, Map<String, Map<String, String>>>> spawnData = f.getSpawnData();
-            Map<String, Map<String, Map<String, String>>> innerData;
-            if (spawnData.containsKey(rod)) {
-
-                innerData = spawnData.get(rod);
-
-            } else if (spawnData.containsKey("Any")) {
-
-                innerData = spawnData.get("Any");
-
-            } else {
-
-                continue;
-
-            }
-
-            Map<String, Map<String, String>> innerData2;
-            if (innerData.containsKey(time)) {
-
-                innerData2 = innerData.get(time);
-
-            } else if (innerData.containsKey("Any")) {
-
-                innerData2 = innerData.get("Any");
-
-            } else {
-
-                continue;
-
-            }
-
-            Map<String, String> data;
-            if (innerData2.containsKey(weather)) {
-
-                data = innerData2.get(weather);
-
-            } else if (innerData2.containsKey("Any")) {
-
-                data = innerData2.get("Any");
-
-            } else {
-
-                continue;
-
-            }
 
             int level = RandomHelper.getRandomNumberBetween(f.getMinLevel(), f.getMaxLevel());
             Pokemon pokemon = PokemonBuilder.builder().species(f.getSpecies()).level(level).build();
@@ -491,7 +463,7 @@ public class SpawnBuilder {
 
         List<FishSpawn> fishSpawns = spawns.getFishSpawns();
         Map<Pokemon, Double> pokemonMap = new HashMap<>();
-        Map<Double, FishSpawn> map = new HashMap<>();
+        Map<Double, List<FishSpawn>> map = new HashMap<>();
         for (FishSpawn f : fishSpawns) {
 
             Map<String, Map<String, Map<String, Map<String, String>>>> spawnData = f.getSpawnData();
@@ -548,7 +520,15 @@ public class SpawnBuilder {
                 pokemon.setForm(f.getForm());
 
             }
-            map.put(spawnChance * modifier, f);
+            spawnChance = spawnChance * modifier;
+            List<FishSpawn> list = new ArrayList<>();
+            if (map.containsKey(spawnChance)) {
+
+                list = map.get(spawnChance);
+
+            }
+            list.add(f);
+            map.put(spawnChance, list);
 
         }
 
@@ -559,16 +539,20 @@ public class SpawnBuilder {
 
             if (RandomHelper.getRandomChance(chances.get(i))) {
 
-                FishSpawn spawn = map.get(chances.get(i));
-                int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-                Pokemon pokemon = PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build();
-                if (!spawn.getForm().equalsIgnoreCase("")) {
+                List<FishSpawn> spawnList = map.get(chances.get(i));
+                for (FishSpawn spawn : spawnList) {
 
-                    pokemon.setForm(spawn.getForm());
+                    int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
+                    Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+                    if (!spawn.getForm().equalsIgnoreCase("")) {
+
+                        pokemon.setForm(spawn.getForm());
+
+                    }
+
+                    pokemonMap.put(pokemon, chances.get(i));
 
                 }
-
-                pokemonMap.put(pokemon, chances.get(i));
 
             }
 
@@ -662,7 +646,7 @@ public class SpawnBuilder {
         Map<Pokemon, Double> pokemonMap = new HashMap<>();
         if (naturalSpawns.size() == 0) return pokemonMap;
         Map<NaturalSpawn, Map<String, String>> m1 = new HashMap<>();
-        Map<Double, NaturalSpawn> m2 = new HashMap<>();
+        Map<Double, List<NaturalSpawn>> m2 = new HashMap<>();
         for (NaturalSpawn n : naturalSpawns) {
 
             Map<String, Map<String, Map<String, String>>> spawnData = n.getSpawnData();
@@ -723,7 +707,19 @@ public class SpawnBuilder {
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
             m1.put(n, data);
-            m2.put(spawnChance * modifier, n);
+            spawnChance = spawnChance * modifier;
+            List<NaturalSpawn> list = new ArrayList<>();
+            if (m2.containsKey(spawnChance)) {
+
+                list = m2.get(spawnChance);
+                list.add(n);
+
+            } else {
+
+                list.add(n);
+
+            }
+            m2.put(spawnChance, list);
 
         }
 
@@ -734,19 +730,23 @@ public class SpawnBuilder {
 
             if (RandomHelper.getRandomChance(chances.get(i))) {
 
-                NaturalSpawn spawn = m2.get(chances.get(i));
-                int groupSize = RandomHelper.getRandomNumberBetween(1, Integer.parseInt(m1.get(spawn).get("Group-Size")));
-                for (int p = 0; p < groupSize; p++) {
+                List<NaturalSpawn> spawnList = m2.get(chances.get(i));
+                for (NaturalSpawn spawn : spawnList) {
 
-                    int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-                    Pokemon pokemon = PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build();
-                    if (!spawn.getForm().equalsIgnoreCase("")) {
+                    int groupSize = RandomHelper.getRandomNumberBetween(1, Integer.parseInt(m1.get(spawn).get("Group-Size")));
+                    for (int p = 0; p < groupSize; p++) {
 
-                        pokemon.setForm(spawn.getForm());
+                        int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
+                        Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+                        if (!spawn.getForm().equalsIgnoreCase("")) {
+
+                            pokemon.setForm(spawn.getForm());
+
+                        }
+
+                        pokemonMap.put(pokemon, chances.get(i));
 
                     }
-
-                    pokemonMap.put(pokemon, chances.get(i));
 
                 }
 
@@ -842,7 +842,7 @@ public class SpawnBuilder {
         Map<Pokemon, Double> pokemonMap = new HashMap<>();
         if (grassSpawns.size() == 0) return pokemonMap;
         Map<GrassSpawn, Map<String, String>> m1 = new HashMap<>();
-        Map<Double, GrassSpawn> m2 = new HashMap<>();
+        Map<Double, List<GrassSpawn>> m2 = new HashMap<>();
         for (GrassSpawn g : grassSpawns) {
 
             Map<String, Map<String, Map<String, String>>> spawnData = g.getSpawnData();
@@ -903,7 +903,15 @@ public class SpawnBuilder {
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
             m1.put(g, data);
-            m2.put(spawnChance * modifier, g);
+            spawnChance = spawnChance * modifier;
+            List<GrassSpawn> list = new ArrayList<>();
+            if (m2.containsKey(spawnChance)) {
+
+                list = m2.get(spawnChance);
+
+            }
+            list.add(g);
+            m2.put(spawnChance, list);
 
         }
 
@@ -914,16 +922,20 @@ public class SpawnBuilder {
 
             if (RandomHelper.getRandomChance(chances.get(i))) {
 
-                GrassSpawn spawn = m2.get(chances.get(i));
-                int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-                Pokemon pokemon = PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build();
-                if (!spawn.getForm().equalsIgnoreCase("")) {
+                List<GrassSpawn> spawnList = m2.get(chances.get(i));
+                for (GrassSpawn spawn : spawnList) {
 
-                    pokemon.setForm(spawn.getForm());
+                    int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
+                    Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+                    if (!spawn.getForm().equalsIgnoreCase("")) {
+
+                        pokemon.setForm(spawn.getForm());
+
+                    }
+
+                    pokemonMap.put(pokemon, chances.get(i));
 
                 }
-
-                pokemonMap.put(pokemon, chances.get(i));
 
             }
 
@@ -978,7 +990,7 @@ public class SpawnBuilder {
         Map<Pokemon, Double> pokemonMap = new HashMap<>();
         if (surfSpawns.size() == 0) return pokemonMap;
         Map<SurfSpawn, Map<String, String>> m1 = new HashMap<>();
-        Map<Double, SurfSpawn> m2 = new HashMap<>();
+        Map<Double, List<SurfSpawn>> m2 = new HashMap<>();
         for (SurfSpawn s : surfSpawns) {
 
             Map<String, Map<String, Map<String, String>>> spawnData = s.getSpawnData();
@@ -1014,7 +1026,15 @@ public class SpawnBuilder {
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
             m1.put(s, data);
-            m2.put(spawnChance * modifier, s);
+            spawnChance = spawnChance * modifier;
+            List<SurfSpawn> list = new ArrayList<>();
+            if (m2.containsKey(spawnChance)) {
+
+                list = m2.get(spawnChance);
+
+            }
+            list.add(s);
+            m2.put(spawnChance, list);
 
         }
 
@@ -1025,16 +1045,20 @@ public class SpawnBuilder {
 
             if (RandomHelper.getRandomChance(chances.get(i))) {
 
-                SurfSpawn spawn = m2.get(chances.get(i));
-                int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-                Pokemon pokemon = PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build();
-                if (!spawn.getForm().equalsIgnoreCase("")) {
+                List<SurfSpawn> spawnList = m2.get(chances.get(i));
+                for (SurfSpawn spawn : spawnList) {
 
-                    pokemon.setForm(spawn.getForm());
+                    int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
+                    Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+                    if (!spawn.getForm().equalsIgnoreCase("")) {
+
+                        pokemon.setForm(spawn.getForm());
+
+                    }
+
+                    pokemonMap.put(pokemon, chances.get(i));
 
                 }
-
-                pokemonMap.put(pokemon, chances.get(i));
 
             }
 

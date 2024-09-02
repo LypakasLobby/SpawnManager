@@ -59,7 +59,7 @@ public class RockSmashSpawner {
         List<WorldTime> times = WorldTime.getCurrent(world);
         for (WorldTime t : times) {
 
-            if (t.name().contains("day") || t.name().contains("dawn") || t.name().contains("morning") || t.name().contains("afternoon")) {
+            if (t.name().contains("DAY") || t.name().contains("DAWN") || t.name().contains("MORNING") || t.name().contains("AFTERNOON")) {
 
                 time = "Day";
                 break;

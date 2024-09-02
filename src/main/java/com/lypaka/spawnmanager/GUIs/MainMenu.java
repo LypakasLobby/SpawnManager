@@ -30,7 +30,7 @@ public class MainMenu {
         int y = player.getPosition().getY();
         int z = player.getPosition().getZ();
         ArrayList<Area> areas = new ArrayList<>(AreaHandler.getSortedAreas(x, y, z, player.world));
-        List<Area> allAreasNoModifications = new ArrayList<>(AreaHandler.getSortedAreas(x, y, z, player.world));;
+        List<Area> allAreasNoModifications = new ArrayList<>(areas);
         if (areas.size() == 0) {
 
             player.sendMessage(FancyText.getFormattedText("&eNot currently in any Areas!"), player.getUniqueID());
