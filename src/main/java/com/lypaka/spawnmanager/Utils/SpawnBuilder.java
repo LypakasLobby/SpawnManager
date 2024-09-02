@@ -218,7 +218,7 @@ public class SpawnBuilder {
                     pokemon.setForm(spawn.getForm());
 
                 }
-                
+
                 pokemonMap.put(pokemon, chances.get(i));
 
             }
@@ -378,6 +378,9 @@ public class SpawnBuilder {
 
             }
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
+            boolean isHostile = ModList.get().isLoaded("hostilepokemon") && RandomHelper.getRandomChance(hostileChance);
+            h.setHostile(isHostile);
             spawnChance = spawnChance * modifier;
             List<HeadbuttSpawn> list = new ArrayList<>();
             if (map.containsKey(spawnChance)) list = map.get(spawnChance);
@@ -712,6 +715,9 @@ public class SpawnBuilder {
 
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
+            boolean isHostile = ModList.get().isLoaded("hostilepokemon") && RandomHelper.getRandomChance(hostileChance);
+            n.setHostile(isHostile);
             m1.put(n, data);
             spawnChance = spawnChance * modifier;
             List<NaturalSpawn> list = new ArrayList<>();
@@ -908,6 +914,9 @@ public class SpawnBuilder {
 
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
+            boolean isHostile = ModList.get().isLoaded("hostilepokemon") && RandomHelper.getRandomChance(hostileChance);
+            g.setHostile(isHostile);
             m1.put(g, data);
             spawnChance = spawnChance * modifier;
             List<GrassSpawn> list = new ArrayList<>();
@@ -1031,6 +1040,9 @@ public class SpawnBuilder {
             }
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
+            boolean isHostile = ModList.get().isLoaded("hostilepokemon") && RandomHelper.getRandomChance(hostileChance);
+            s.setHostile(isHostile);
             m1.put(s, data);
             spawnChance = spawnChance * modifier;
             List<SurfSpawn> list = new ArrayList<>();
