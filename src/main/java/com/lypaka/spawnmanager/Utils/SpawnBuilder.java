@@ -1,11 +1,14 @@
 package com.lypaka.spawnmanager.Utils;
 
+import com.lypaka.hostilepokemon.API.SetHostileEvent;
 import com.lypaka.lypakautils.MiscHandlers.PixelmonHelpers;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.*;
 import com.lypaka.spawnmanager.SpawnManager;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
 import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraftforge.fml.ModList;
 
 import java.util.*;
 
@@ -160,6 +163,9 @@ public class SpawnBuilder {
 
             }
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance")) * modifier;
+            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
+            boolean isHostile = ModList.get().isLoaded("hostilepokemon") && RandomHelper.getRandomChance(hostileChance);
+            h.setHostile(isHostile);
             List<RockSmashSpawn> list = new ArrayList<>();
             if (map.containsKey(spawnChance)) list = map.get(spawnChance);
             if (stoneTypes.equalsIgnoreCase("Any")) {
@@ -212,7 +218,7 @@ public class SpawnBuilder {
                     pokemon.setForm(spawn.getForm());
 
                 }
-
+                
                 pokemonMap.put(pokemon, chances.get(i));
 
             }

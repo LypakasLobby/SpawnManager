@@ -2,6 +2,8 @@ package com.lypaka.spawnmanager.Spawners;
 
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Areas.AreaHandler;
+import com.lypaka.hostilepokemon.API.SetHostileEvent;
+import com.lypaka.hostilepokemon.HostilePokemon;
 import com.lypaka.lypakautils.Listeners.JoinListener;
 import com.lypaka.spawnmanager.API.AreaHeadbuttSpawnEvent;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
@@ -29,6 +31,7 @@ import com.pixelmonmod.pixelmon.entities.pixelmon.StatueEntity;
 import com.pixelmonmod.pixelmon.entities.pokeballs.OccupiedPokeBallEntity;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -224,6 +227,15 @@ public class HeadbuttSpawner {
 
                                             // we're just gonna spawn the Pokemon on the player to avoid having to do RNGs and maths and shit
                                             PixelmonEntity pixelmon = spawnEvent.getToSpawn().getOrCreatePixelmon(world, x, y, z);
+                                            if (spawnInfoMap.get(poke).isHostile()) {
+
+                                                double defaultAtk = pixelmon.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                                                double defaultSpd = pixelmon.getAttributeValue(Attributes.ATTACK_SPEED);
+                                                SetHostileEvent hostileEvent = new SetHostileEvent(player, pixelmon, defaultAtk, defaultSpd, 1.5);
+                                                MinecraftForge.EVENT_BUS.post(hostileEvent);
+                                                if (!hostileEvent.isCanceled()) HostilePokemon.setHostile(pixelmon, player, hostileEvent.getAttackDamage(), hostileEvent.getAttackSpeed(), hostileEvent.getMovementSpeed());
+
+                                            }
                                             player.world.getServer().deferTask(() -> {
 
                                                 player.world.addEntity(pixelmon);

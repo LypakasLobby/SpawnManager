@@ -2,6 +2,8 @@ package com.lypaka.spawnmanager.Spawners;
 
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Areas.AreaHandler;
+import com.lypaka.hostilepokemon.API.SetHostileEvent;
+import com.lypaka.hostilepokemon.HostilePokemon;
 import com.lypaka.lypakautils.API.PlayerMovementEvent;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.spawnmanager.API.AreaGrassSpawnEvent;
@@ -24,6 +26,7 @@ import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipan
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
 import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -197,6 +200,15 @@ public class GrassSpawner {
                             if (areasAtSpawn.size() == 0) continue;
                             PixelmonEntity pixelmon = toSpawn.getOrCreatePixelmon(world, spawnX, spawnY + 1.5, spawnZ);
                             Pokemon finalToSpawn = toSpawn;
+                            if (spawnInfoMap.get(toSpawn).isHostile()) {
+
+                                double defaultAtk = pixelmon.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                                double defaultSpd = pixelmon.getAttributeValue(Attributes.ATTACK_SPEED);
+                                SetHostileEvent hostileEvent = new SetHostileEvent(player, pixelmon, defaultAtk, defaultSpd, 1.5);
+                                MinecraftForge.EVENT_BUS.post(hostileEvent);
+                                if (!hostileEvent.isCanceled()) HostilePokemon.setHostile(pixelmon, player, hostileEvent.getAttackDamage(), hostileEvent.getAttackSpeed(), hostileEvent.getMovementSpeed());
+
+                            }
                             player.world.getServer().deferTask(() -> {
 
                                 pixelmon.setSpawnLocation(pixelmon.getDefaultSpawnLocation());

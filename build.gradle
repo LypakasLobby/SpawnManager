@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 
 
 group = 'com.lypaka'
-version = '1.16.5-1.0.6'
+version = '1.16.5-1.1.0'
 
 java {
     archivesBaseName = 'SpawnManager'
@@ -110,6 +110,7 @@ dependencies {
     compileOnly fileTree(dir: 'C:\\Users\\ryan9\\Documents\\GitHub\\LIBRARIES', include: ['Reforged.jar'])
     compileOnly fileTree(dir: 'C:\\Users\\ryan9\\Documents\\GitHub\\LIBRARIES', include: ['GooeyLibs-1.16.5.jar'])
     compileOnly fileTree(dir: 'C:\\Users\\ryan9\\Documents\\GitHub\\LIBRARIES', include: ['AreaManager-1.16.5-1.0.5.jar'])
+    compileOnly fileTree(dir: 'C:\\Users\\ryan9\\Documents\\GitHub\\LIBRARIES', include: ['HostilePokemon.jar'])
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
