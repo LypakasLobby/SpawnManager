@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="848b1bba-3e18-42b0-a495-948ac157de46" name="Changes" comment="">
+    <list default="true" id="848b1bba-3e18-42b0-a495-948ac157de46" name="Changes" comment="Fixed a weird, somehow mandatory, requirement on HostilePokemon">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Utils/HostileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.6.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.6.1/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.6.1/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.6.1/checksums/sha1-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/7.6.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/7.6.1/executionHistory/executionHistory.bin" afterDir="false" />
@@ -17,59 +18,21 @@
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/GUIs/MainMenu.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/GUIs/MainMenu.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/FishSpawner.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/FishSpawner.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/GrassSpawner.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/GrassSpawner.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/HeadbuttSpawner.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/HeadbuttSpawner.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/NaturalSpawner$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/NaturalSpawner$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/NaturalSpawner.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/NaturalSpawner.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/RockSmashSpawner.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/RockSmashSpawner.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/SurfSpawner.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Spawners/SurfSpawner.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Utils/SpawnBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/lypaka/spawnmanager/Utils/SpawnBuilder.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/reobfJar/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/reobfJar/log.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/reobfJar/output.jar" beforeDir="false" afterPath="$PROJECT_DIR$/build/reobfJar/output.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/AllSpawnsMenu$1.class.uniqueId21" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/AllSpawnsMenu$2.class.uniqueId11" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/AllSpawnsMenu.class.uniqueId2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/BattleEndListener.class.uniqueId28" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/FishSpawner.class.uniqueId9" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/GrassSpawner.class.uniqueId25" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/HeadbuttSpawner.class.uniqueId18" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/LoadListener.class.uniqueId8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/NaturalPixelmonSpawnListener.class.uniqueId6" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/NaturalSpawner$1.class.uniqueId4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/NaturalSpawner.class.uniqueId26" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/PossibleSpawnsMenu$1.class.uniqueId7" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/PossibleSpawnsMenu$2.class.uniqueId27" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/PossibleSpawnsMenu.class.uniqueId32" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/ReloadCommand$1.class.uniqueId29" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/ReloadCommand.class.uniqueId15" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/RockSmashSpawner.class.uniqueId23" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/ServerStartedListener$1.class.uniqueId17" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/ServerStartedListener.class.uniqueId16" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnArea.class.uniqueId30" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$1.class.uniqueId5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$2.class.uniqueId14" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$3.class.uniqueId31" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$4.class.uniqueId12" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$5.class.uniqueId20" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$6.class.uniqueId24" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$7.class.uniqueId13" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$8.class.uniqueId0" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$8.class.uniqueId0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler$9.class.uniqueId19" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnAreaHandler.class.uniqueId3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SpawnManagerCommand.class.uniqueId10" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/SurfSpawner.class.uniqueId22" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/jar/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/jar/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/GUIs/MainMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/GUIs/MainMenu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/FishSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/FishSpawner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/GrassSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/GrassSpawner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/HeadbuttSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/HeadbuttSpawner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/NaturalSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/NaturalSpawner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/RockSmashSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/RockSmashSpawner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/SurfSpawner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Spawners/SurfSpawner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Utils/SpawnBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lypaka/spawnmanager/Utils/SpawnBuilder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -177,6 +140,38 @@
       <option name="presentableId" value="Default" />
       <updated>1692156662289</updated>
     </task>
+    <task id="LOCAL-00001" summary="1.0.6">
+      <option name="closed" value="true" />
+      <created>1725258254299</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1725258254299</updated>
+    </task>
+    <task id="LOCAL-00002" summary="1.1.0 - HostilePokemon support">
+      <option name="closed" value="true" />
+      <created>1725260579960</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1725260579960</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Hey, stupid, finish adding the shit before you release updates">
+      <option name="closed" value="true" />
+      <created>1725260936640</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1725260936640</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="1.0.6" />
+    <MESSAGE value="1.1.0 - HostilePokemon support" />
+    <MESSAGE value="Hey, stupid, finish adding the shit before you release updates" />
+    <MESSAGE value="Fixed a weird, somehow mandatory, requirement on HostilePokemon" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a weird, somehow mandatory, requirement on HostilePokemon" />
   </component>
 </project>

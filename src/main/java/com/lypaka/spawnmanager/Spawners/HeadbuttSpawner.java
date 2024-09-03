@@ -12,6 +12,7 @@ import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
+import com.lypaka.spawnmanager.Utils.HostileManager;
 import com.lypaka.spawnmanager.Utils.SpawnBuilder;
 import com.pixelmonmod.pixelmon.api.events.PokeBallImpactEvent;
 import com.pixelmonmod.pixelmon.api.events.moveskills.UseMoveSkillEvent;
@@ -229,11 +230,7 @@ public class HeadbuttSpawner {
                                             PixelmonEntity pixelmon = spawnEvent.getToSpawn().getOrCreatePixelmon(world, x, y, z);
                                             if (spawnInfoMap.get(poke).isHostile()) {
 
-                                                double defaultAtk = pixelmon.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                                                double defaultSpd = pixelmon.getAttributeValue(Attributes.ATTACK_SPEED);
-                                                SetHostileEvent hostileEvent = new SetHostileEvent(player, pixelmon, defaultAtk, defaultSpd, 1.5);
-                                                MinecraftForge.EVENT_BUS.post(hostileEvent);
-                                                if (!hostileEvent.isCanceled()) HostilePokemon.setHostile(pixelmon, player, hostileEvent.getAttackDamage(), hostileEvent.getAttackSpeed(), hostileEvent.getMovementSpeed());
+                                                HostileManager.setHostile(pixelmon, player);
 
                                             }
                                             player.world.getServer().deferTask(() -> {
