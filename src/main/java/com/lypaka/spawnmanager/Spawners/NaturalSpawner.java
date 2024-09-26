@@ -88,7 +88,15 @@ public class NaturalSpawner {
 
                                 if (uuid == null) continue;
                                 ServerPlayerEntity player = JoinListener.playerMap.get(uuid);
-                                if (player == null) continue;
+                                try {
+
+                                    if (player == null) continue;
+
+                                } catch (NullPointerException e) {
+
+                                    continue;
+
+                                }
                                 int x;// = player.getPosition().getX();
                                 try {
 
