@@ -26,13 +26,21 @@ public class DisconnectListener {
 
                 if (e.toString().equalsIgnoreCase(player.getUniqueID().toString())) {
 
-                    Map<UUID, List<PixelmonEntity>> spawns = NaturalSpawner.pokemonSpawnedMap.get(key);
-                    List<PixelmonEntity> pokemon = spawns.get(player.getUniqueID());
-                    for (PixelmonEntity entity : pokemon) {
+                    if (NaturalSpawner.pokemonSpawnedMap.containsKey(key)) {
 
-                        if (entity.battleController == null) {
+                        Map<UUID, List<PixelmonEntity>> spawns = NaturalSpawner.pokemonSpawnedMap.get(key);
+                        if (spawns != null) {
 
-                            entity.remove();
+                            List<PixelmonEntity> pokemon = spawns.get(player.getUniqueID());
+                            for (PixelmonEntity entity : pokemon) {
+
+                                if (entity.battleController == null) {
+
+                                    entity.remove();
+
+                                }
+
+                            }
 
                         }
 
