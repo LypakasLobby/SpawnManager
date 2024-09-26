@@ -12,6 +12,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.text.ITextComponent;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,9 @@ public class PossibleSpawnsList {
                             String location = data3.get("Spawn-Location");
                             if (location.contains(playerLocation)) {
 
+                                double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                                DecimalFormat df = new DecimalFormat("#.##");
+                                String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
                                 ItemStack sprite = SpriteItemHelper.getPhoto(p);
                                 sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                                 List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
@@ -81,6 +85,7 @@ public class PossibleSpawnsList {
                                             String formatting = "&c";
                                             if (percent.contains("1")) formatting = "&4&l";
                                             if (percent.contains("5")) formatting = "&e&l";
+                                            if (percent.contains("30")) formatting = "&c";
                                             if (percent.contains("50")) formatting = "&b";
                                             if (percent.contains("100")) formatting = "&a";
                                             for (String s : entry.getValue()) {
@@ -106,6 +111,7 @@ public class PossibleSpawnsList {
                                             .replace("%form%", form)
                                             .replace("%levelRange%", levelRange)
                                             .replace("%spawner%", "Natural Spawner")
+                                            .replace("%spawnChance%", spawnChanceDisplay)
                                     ))));
 
                                 }
@@ -160,6 +166,9 @@ public class PossibleSpawnsList {
                             String weather = d3.getKey();
                             if (weather.equalsIgnoreCase(playerWeather) || weather.equalsIgnoreCase("Any")) {
 
+                                double spawnChance = Double.parseDouble(d3.getValue().get("Spawn-Chance"));
+                                DecimalFormat df = new DecimalFormat("#.##");
+                                String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
                                 ItemStack sprite = SpriteItemHelper.getPhoto(p);
                                 sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                                 List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
@@ -219,6 +228,7 @@ public class PossibleSpawnsList {
                                             .replace("%levelRange%", levelRange)
                                             .replace("%spawner%", "Fish Spawner")
                                             .replace("%rodTypes%", String.join(", ", rodList))
+                                            .replace("%spawnChance%", spawnChanceDisplay)
                                     ))));
 
                                 }
@@ -271,6 +281,9 @@ public class PossibleSpawnsList {
                             Map<String, String> data3 = d2.getValue();
                             String woodType = data3.get("Wood-Types");
                             if (!woodTypes.contains(woodType)) woodTypes.add(woodType);
+                            double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
                             ItemStack sprite = SpriteItemHelper.getPhoto(p);
                             sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                             List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
@@ -304,6 +317,7 @@ public class PossibleSpawnsList {
                                         String formatting = "&c";
                                         if (percent.contains("1")) formatting = "&4&l";
                                         if (percent.contains("5")) formatting = "&e&l";
+                                        if (percent.contains("30")) formatting = "&c";
                                         if (percent.contains("50")) formatting = "&b";
                                         if (percent.contains("100")) formatting = "&a";
                                         for (String s : entry.getValue()) {
@@ -330,6 +344,7 @@ public class PossibleSpawnsList {
                                         .replace("%levelRange%", levelRange)
                                         .replace("%spawner%", "Headbutt Spawner")
                                         .replace("%woodTypes%", String.join("\n", woodTypes))
+                                        .replace("%spawnChance%", spawnChanceDisplay)
                                 ))));
 
                             }
@@ -380,6 +395,9 @@ public class PossibleSpawnsList {
                             Map<String, String> data3 = d2.getValue();
                             String stoneType = data3.get("Stone-Types");
                             if (!stoneTypes.contains(stoneType)) stoneTypes.add(stoneType);
+                            double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
                             ItemStack sprite = SpriteItemHelper.getPhoto(p);
                             sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                             List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
@@ -413,6 +431,7 @@ public class PossibleSpawnsList {
                                         String formatting = "&c";
                                         if (percent.contains("1")) formatting = "&4&l";
                                         if (percent.contains("5")) formatting = "&e&l";
+                                        if (percent.contains("30")) formatting = "&c";
                                         if (percent.contains("50")) formatting = "&b";
                                         if (percent.contains("100")) formatting = "&a";
                                         for (String s : entry.getValue()) {
@@ -439,6 +458,7 @@ public class PossibleSpawnsList {
                                         .replace("%levelRange%", levelRange)
                                         .replace("%spawner%", "Rock Smash Spawner")
                                         .replace("%stoneTypes%", String.join("\n", stoneTypes))
+                                        .replace("%spawnChance%", spawnChanceDisplay)
                                 ))));
 
                             }
@@ -489,6 +509,9 @@ public class PossibleSpawnsList {
                             String location = data3.get("Spawn-Location");
                             if (location.equalsIgnoreCase("Any") || location.contains(playerLocation)) {
 
+                                double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                                DecimalFormat df = new DecimalFormat("#.##");
+                                String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
                                 ItemStack sprite = SpriteItemHelper.getPhoto(p);
                                 sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                                 List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
@@ -522,6 +545,7 @@ public class PossibleSpawnsList {
                                             String formatting = "&c";
                                             if (percent.contains("1")) formatting = "&4&l";
                                             if (percent.contains("5")) formatting = "&e&l";
+                                            if (percent.contains("30")) formatting = "&c";
                                             if (percent.contains("50")) formatting = "&b";
                                             if (percent.contains("100")) formatting = "&a";
                                             for (String s : entry.getValue()) {
@@ -547,6 +571,7 @@ public class PossibleSpawnsList {
                                             .replace("%form%", form)
                                             .replace("%levelRange%", levelRange)
                                             .replace("%spawner%", "Grass Spawner")
+                                            .replace("%spawnChance%", spawnChanceDisplay)
                                     ))));
 
                                 }
@@ -595,6 +620,9 @@ public class PossibleSpawnsList {
                         String weather = d2.getKey();
                         if (weather.equalsIgnoreCase(playerWeather)) {
 
+                            double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
                             ItemStack sprite = SpriteItemHelper.getPhoto(p);
                             sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                             List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
@@ -628,6 +656,7 @@ public class PossibleSpawnsList {
                                         String formatting = "&c";
                                         if (percent.contains("1")) formatting = "&4&l";
                                         if (percent.contains("5")) formatting = "&e&l";
+                                        if (percent.contains("30")) formatting = "&c";
                                         if (percent.contains("50")) formatting = "&b";
                                         if (percent.contains("100")) formatting = "&a";
                                         for (String s : entry.getValue()) {
@@ -653,6 +682,7 @@ public class PossibleSpawnsList {
                                         .replace("%form%", form)
                                         .replace("%levelRange%", levelRange)
                                         .replace("%spawner%", "Surf Spawner")
+                                        .replace("%spawnChance%", spawnChanceDisplay)
                                 ))));
 
                             }

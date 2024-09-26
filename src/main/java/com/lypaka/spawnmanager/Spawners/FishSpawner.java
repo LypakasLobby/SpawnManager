@@ -8,9 +8,11 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
+import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.lypaka.spawnmanager.Utils.SpawnBuilder;
-import com.pixelmonmod.pixelmon.Pixelmon;
+import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.events.FishingEvent;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
@@ -22,6 +24,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 
 import java.util.*;
 
@@ -142,13 +145,14 @@ public class FishSpawner {
                 AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                 if (spawns.getFishSpawns().size() > 0) {
 
-                    Map<Pokemon, Double> pokemon = SpawnBuilder.buildFishSpawns(rod, time, weather, spawns, modifier);
-                    Map<Pokemon, PokemonSpawn> spawnInfoMap = SpawnBuilder.getPokemonFishSpawnInfo(rod, time, weather, spawns);
-                    for (Map.Entry<Pokemon, Double> p : pokemon.entrySet()) {
+                    Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildFishSpawns(rod, time, weather, spawns, modifier);
+                    Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
+                    for (Map.Entry<PokemonSpawn, Double> p : pokemon.entrySet()) {
 
                         if (RandomHelper.getRandomChance(p.getValue())) {
 
-                            Pokemon poke = p.getKey();
+                            Pokemon poke = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(p.getKey());
+                            mapForHustle.put(poke, p.getKey());
                             if (Intimidate.applies(playersPokemon) || KeenEye.applies(playersPokemon)) {
 
                                 poke = Intimidate.tryIntimidate(poke, playersPokemon);
@@ -190,7 +194,7 @@ public class FishSpawner {
                             int level = poke.getPokemonLevel();
                             if (Hustle.applies(playersPokemon) || Pressure.applies(playersPokemon) || VitalSpirit.applies(playersPokemon)) {
 
-                                level = Hustle.tryHustle(level, spawnInfoMap.get(poke));
+                                level = Hustle.tryHustle(level, mapForHustle.get(poke));
 
                             }
                             poke.setLevel(level);
@@ -208,6 +212,28 @@ public class FishSpawner {
                                     fishedUpPokemon.getPokemon().setSpecies(spawnEvent.getPokemon().getSpecies(), false);
                                     fishedUpPokemon.getPokemon().setForm(spawnEvent.getPokemon().getForm());
                                     fishedUpPokemon.getPokemon().setLevel(spawnEvent.getPokemon().getPokemonLevel());
+                                    if (ModList.get().isLoaded("hostilepokemon")) {
+
+                                        HostileManager.tryHostile(mapForHustle.get(poke), fishedUpPokemon, player);
+
+                                    }
+                                    if (!fishedUpPokemon.getPersistentData().contains("IsHostile")) {
+
+                                        if (ModList.get().isLoaded("totempokemon")) {
+
+                                            TotemManager.tryTotem(mapForHustle.get(poke), fishedUpPokemon, player);
+
+                                        } else {
+
+                                            if (ModList.get().isLoaded("titanpokemon")) {
+
+                                                TitanManager.tryTitan(mapForHustle.get(poke), fishedUpPokemon, player);
+
+                                            }
+
+                                        }
+
+                                    }
                                     if (spawnArea.getFishSpawnerSettings().doesDespawnAfterBattle()) {
 
                                         spawnedPokemonUUIDs.add(fishedUpPokemon.getUniqueID());

@@ -1,5 +1,7 @@
 package com.lypaka.spawnmanager.Utils.ExternalAbilities;
 
+import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
+import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.pokemon.Element;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
@@ -15,15 +17,15 @@ public class Harvest {
 
     }
 
-    public static Pokemon tryHarvest (Pokemon originalSpawn, Map<Pokemon, Double> possibleSpawns) {
+    public static Pokemon tryHarvest (Pokemon originalSpawn, Map<PokemonSpawn, Double> possibleSpawns) {
 
         if (!RandomHelper.getRandomChance(50)) return originalSpawn;
-        Map<Pokemon, Double> pokemonMap = new HashMap<>();
-        Map<UUID, Pokemon> m1 = new HashMap<>();
+        Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
+        Map<UUID, PokemonSpawn> m1 = new HashMap<>();
         Map<Double, UUID> m2 = new HashMap<>();
-        for (Map.Entry<Pokemon, Double> entry : possibleSpawns.entrySet()) {
+        for (Map.Entry<PokemonSpawn, Double> entry : possibleSpawns.entrySet()) {
 
-            if (entry.getKey().getForm().getTypes().contains(Element.GRASS)) {
+            if (entry.getKey().getTypes().contains(Element.GRASS)) {
 
                 if (!pokemonMap.containsKey(entry.getKey())) {
 
@@ -47,7 +49,7 @@ public class Harvest {
                 if (RandomHelper.getRandomChance(chance)) {
 
                     UUID uuid = m2.get(chance);
-                    return m1.get(uuid);
+                    return PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(m1.get(uuid));
 
                 }
 

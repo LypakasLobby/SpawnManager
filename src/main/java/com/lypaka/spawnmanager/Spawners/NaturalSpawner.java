@@ -2,9 +2,6 @@ package com.lypaka.spawnmanager.Spawners;
 
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Areas.AreaHandler;
-import com.lypaka.areamanager.Regions.Region;
-import com.lypaka.hostilepokemon.API.SetHostileEvent;
-import com.lypaka.hostilepokemon.HostilePokemon;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.lypakautils.Listeners.JoinListener;
 import com.lypaka.spawnmanager.API.AreaNaturalSpawnEvent;
@@ -12,11 +9,12 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
-import com.lypaka.spawnmanager.SpawnManager;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
+import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.lypaka.spawnmanager.Utils.HostileManager;
-import com.lypaka.spawnmanager.Utils.SpawnBuilder;
+import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
@@ -28,12 +26,12 @@ import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipan
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
 import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModList;
 
 import java.util.*;
 
@@ -61,7 +59,6 @@ public class NaturalSpawner {
 
                 for (Map.Entry<String, Map<Area, List<UUID>>> map : AreaHandler.playersInArea.entrySet()) {
 
-                    String key = map.getKey();
                     Map<Area, List<UUID>> map2 = map.getValue();
                     for (Map.Entry<Area, List<UUID>> entry : map2.entrySet()) {
 
@@ -91,7 +88,17 @@ public class NaturalSpawner {
 
                                 if (uuid == null) continue;
                                 ServerPlayerEntity player = JoinListener.playerMap.get(uuid);
-                                int x = player.getPosition().getX();
+                                if (player == null) continue;
+                                int x;// = player.getPosition().getX();
+                                try {
+
+                                    x = player.getPosition().getX();
+
+                                } catch (NullPointerException er) {
+
+                                    continue;
+
+                                }
                                 int y = player.getPosition().getY();
                                 int z = player.getPosition().getZ();
                                 World world = player.world;
@@ -193,26 +200,27 @@ public class NaturalSpawner {
                                     AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(currentSpawnArea);
                                     if (spawns.getNaturalSpawns().size() > 0) {
 
-                                        Map<Pokemon, Double> pokemon = SpawnBuilder.buildNaturalSpawnsList(time, weather, location, spawns, modifier);
-                                        Map<Pokemon, PokemonSpawn> spawnInfoMap = SpawnBuilder.getPokemonNaturalSpawnInfo(time, weather, location, spawns);
+                                        Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildNaturalSpawnsList(time, weather, location, spawns, modifier);
+                                        Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
                                         Pokemon firstPokemonSpawned = null;
                                         List<Pokemon> toSpawn = new ArrayList<>();
-                                        for (Map.Entry<Pokemon, Double> p : pokemon.entrySet()) {
+                                        for (Map.Entry<PokemonSpawn, Double> p : pokemon.entrySet()) {
 
                                             if (firstPokemonSpawned == null) {
 
                                                 if (RandomHelper.getRandomChance(p.getValue())) {
 
-                                                    firstPokemonSpawned = p.getKey();
-                                                    toSpawn.add(p.getKey());
+                                                    firstPokemonSpawned = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(p.getKey());
+                                                    toSpawn.add(firstPokemonSpawned);
+                                                    mapForHustle.put(firstPokemonSpawned, p.getKey());
 
                                                 }
 
                                             } else {
 
-                                                if (p.getKey().getSpecies() == firstPokemonSpawned.getSpecies()) {
+                                                if (p.getKey().getSpecies().equalsIgnoreCase(firstPokemonSpawned.getSpecies().getName())) {
 
-                                                    toSpawn.add(p.getKey());
+                                                    toSpawn.add(PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(p.getKey()));
 
                                                 }
 
@@ -267,7 +275,7 @@ public class NaturalSpawner {
                                                 int level = poke.getPokemonLevel();
                                                 if (Hustle.applies(playersPokemon) || Pressure.applies(playersPokemon) || VitalSpirit.applies(playersPokemon)) {
 
-                                                    level = Hustle.tryHustle(level, spawnInfoMap.get(poke));
+                                                    level = Hustle.tryHustle(level, mapForHustle.get(poke));
 
                                                 }
                                                 poke.setLevel(level);
@@ -321,16 +329,32 @@ public class NaturalSpawner {
                                                 Pokemon finalPoke = poke;
                                                 int finalSpawnX = spawnX;
                                                 int finalSpawnZ = spawnZ;
-                                                if (spawnInfoMap.get(poke).isHostile()) {
-
-                                                    HostileManager.setHostile(pixelmon, player);
-
-                                                }
                                                 player.world.getServer().deferTask(() -> {
-
 
                                                     pixelmon.setSpawnLocation(pixelmon.getDefaultSpawnLocation());
                                                     pixelmon.setPosition(finalSpawnX, spawnY + 1.5, finalSpawnZ);
+                                                    if (ModList.get().isLoaded("hostilepokemon")) {
+
+                                                        HostileManager.tryHostile(mapForHustle.get(finalPoke), pixelmon, player);
+
+                                                    }
+                                                    if (!pixelmon.getPersistentData().contains("IsHostile")) {
+
+                                                        if (ModList.get().isLoaded("totempokemon")) {
+
+                                                            TotemManager.tryTotem(mapForHustle.get(finalPoke), pixelmon, player);
+
+                                                        } else {
+
+                                                            if (ModList.get().isLoaded("titanpokemon")) {
+
+                                                                TitanManager.tryTitan(mapForHustle.get(finalPoke), pixelmon, player);
+
+                                                            }
+
+                                                        }
+
+                                                    }
                                                     player.world.addEntity(pixelmon);
                                                     if (currentSpawnArea.getNaturalSpawnerSettings().doesDespawnAfterBattle()) {
 

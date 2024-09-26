@@ -8,7 +8,7 @@ public class SurfSpawn extends PokemonSpawn {
 
     public SurfSpawn (String species, String form, int minLevel, int maxLevel, Map<String, Map<String, Map<String, String>>> spawnData) {
 
-        super(species, form, minLevel, maxLevel);
+        super(species, form, minLevel, maxLevel, 0, 0, 0);
         this.spawnData = spawnData;
 
     }

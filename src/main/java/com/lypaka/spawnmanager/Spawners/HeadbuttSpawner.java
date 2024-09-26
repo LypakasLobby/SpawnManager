@@ -2,8 +2,6 @@ package com.lypaka.spawnmanager.Spawners;
 
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Areas.AreaHandler;
-import com.lypaka.hostilepokemon.API.SetHostileEvent;
-import com.lypaka.hostilepokemon.HostilePokemon;
 import com.lypaka.lypakautils.Listeners.JoinListener;
 import com.lypaka.spawnmanager.API.AreaHeadbuttSpawnEvent;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
@@ -11,9 +9,11 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
+import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.lypaka.spawnmanager.Utils.HostileManager;
-import com.lypaka.spawnmanager.Utils.SpawnBuilder;
+import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.events.PokeBallImpactEvent;
 import com.pixelmonmod.pixelmon.api.events.moveskills.UseMoveSkillEvent;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
@@ -32,11 +32,11 @@ import com.pixelmonmod.pixelmon.entities.pixelmon.StatueEntity;
 import com.pixelmonmod.pixelmon.entities.pokeballs.OccupiedPokeBallEntity;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -163,14 +163,15 @@ public class HeadbuttSpawner {
                         AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                         if (spawns.getHeadbuttSpawns().size() > 0) {
 
-                            Map<Pokemon, Double> pokemonMap = SpawnBuilder.buildHeadbuttSpawns(time, weather, blockID, spawns, modifier);
-                            Map<Pokemon, PokemonSpawn> spawnInfoMap = SpawnBuilder.getHeadbuttSpawnInfo(time, weather, blockID, spawns);
+                            Map<PokemonSpawn, Double> pokemonMap = PokemonSpawnBuilder.buildHeadbuttSpawns(time, weather, blockID, spawns, modifier);
+                            Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
 
-                            for (Map.Entry<Pokemon, Double> pEntry : pokemonMap.entrySet()) {
+                            for (Map.Entry<PokemonSpawn, Double> pEntry : pokemonMap.entrySet()) {
 
                                 if (RandomHelper.getRandomChance(pEntry.getValue())) {
 
-                                    Pokemon poke = pEntry.getKey();
+                                    Pokemon poke = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(pEntry.getKey());
+                                    mapForHustle.put(poke, pEntry.getKey());
                                     if (Intimidate.applies(firstPokemon) || KeenEye.applies(firstPokemon)) {
 
                                         poke = Intimidate.tryIntimidate(poke, firstPokemon);
@@ -212,7 +213,7 @@ public class HeadbuttSpawner {
                                     int level = poke.getPokemonLevel();
                                     if (Hustle.applies(firstPokemon) || Pressure.applies(firstPokemon) || VitalSpirit.applies(firstPokemon)) {
 
-                                        level = Hustle.tryHustle(level, spawnInfoMap.get(poke));
+                                        level = Hustle.tryHustle(level, mapForHustle.get(poke));
 
                                     }
                                     poke.setLevel(level);
@@ -228,9 +229,26 @@ public class HeadbuttSpawner {
 
                                             // we're just gonna spawn the Pokemon on the player to avoid having to do RNGs and maths and shit
                                             PixelmonEntity pixelmon = spawnEvent.getToSpawn().getOrCreatePixelmon(world, x, y, z);
-                                            if (spawnInfoMap.get(poke).isHostile()) {
+                                            if (ModList.get().isLoaded("hostilepokemon")) {
 
-                                                HostileManager.setHostile(pixelmon, player);
+                                                HostileManager.tryHostile(mapForHustle.get(poke), pixelmon, player);
+
+                                            }
+                                            if (!pixelmon.getPersistentData().contains("IsHostile")) {
+
+                                                if (ModList.get().isLoaded("totempokemon")) {
+
+                                                    TotemManager.tryTotem(mapForHustle.get(poke), pixelmon, player);
+
+                                                } else {
+
+                                                    if (ModList.get().isLoaded("titanpokemon")) {
+
+                                                        TitanManager.tryTitan(mapForHustle.get(poke), pixelmon, player);
+
+                                                    }
+
+                                                }
 
                                             }
                                             player.world.getServer().deferTask(() -> {
@@ -387,14 +405,15 @@ public class HeadbuttSpawner {
                             AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                             if (spawns.getHeadbuttSpawns().size() > 0) {
 
-                                Map<Pokemon, Double> pokemonMap = SpawnBuilder.buildHeadbuttSpawns(time, weather, entityID, spawns, modifier);
-                                Map<Pokemon, PokemonSpawn> spawnInfoMap = SpawnBuilder.getHeadbuttSpawnInfo(time, weather, entityID, spawns);
+                                Map<PokemonSpawn, Double> pokemonMap = PokemonSpawnBuilder.buildHeadbuttSpawns(time, weather, entityID, spawns, modifier);
+                                Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
 
-                                for (Map.Entry<Pokemon, Double> pEntry : pokemonMap.entrySet()) {
+                                for (Map.Entry<PokemonSpawn, Double> pEntry : pokemonMap.entrySet()) {
 
                                     if (RandomHelper.getRandomChance(pEntry.getValue())) {
 
-                                        Pokemon poke = pEntry.getKey();
+                                        Pokemon poke = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(pEntry.getKey());
+                                        mapForHustle.put(poke, pEntry.getKey());
                                         if (Intimidate.applies(firstPokemon) || KeenEye.applies(firstPokemon)) {
 
                                             poke = Intimidate.tryIntimidate(poke, firstPokemon);
@@ -436,7 +455,7 @@ public class HeadbuttSpawner {
                                         int level = poke.getPokemonLevel();
                                         if (Hustle.applies(firstPokemon) || Pressure.applies(firstPokemon) || VitalSpirit.applies(firstPokemon)) {
 
-                                            level = Hustle.tryHustle(level, spawnInfoMap.get(poke));
+                                            level = Hustle.tryHustle(level, mapForHustle.get(poke));
 
                                         }
                                         poke.setLevel(level);
@@ -452,6 +471,28 @@ public class HeadbuttSpawner {
 
                                                 // we're just gonna spawn the Pokemon on the player to avoid having to do RNGs and maths and shit
                                                 PixelmonEntity pixelmon = spawnEvent.getToSpawn().getOrCreatePixelmon(world, x, y, z);
+                                                if (ModList.get().isLoaded("hostilepokemon")) {
+
+                                                    HostileManager.tryHostile(mapForHustle.get(poke), pixelmon, player);
+
+                                                }
+                                                if (!pixelmon.getPersistentData().contains("IsHostile")) {
+
+                                                    if (ModList.get().isLoaded("totempokemon")) {
+
+                                                        TotemManager.tryTotem(mapForHustle.get(poke), pixelmon, player);
+
+                                                    } else {
+
+                                                        if (ModList.get().isLoaded("titanpokemon")) {
+
+                                                            TitanManager.tryTitan(mapForHustle.get(poke), pixelmon, player);
+
+                                                        }
+
+                                                    }
+
+                                                }
                                                 player.world.getServer().deferTask(() -> {
 
                                                     player.world.addEntity(pixelmon);
@@ -564,6 +605,7 @@ public class HeadbuttSpawner {
         if (event.moveSkill.id.equalsIgnoreCase("headbutt")) {
 
             ServerPlayerEntity player = (ServerPlayerEntity) event.pixelmon.getOwner();
+            if (player == null) return;
             int x = event.pixelmon.getPosition().getX();
             int y = event.pixelmon.getPosition().getY();
             int z = event.pixelmon.getPosition().getZ();
@@ -646,14 +688,15 @@ public class HeadbuttSpawner {
                 AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                 if (spawns.getHeadbuttSpawns().size() > 0) {
 
-                    Map<Pokemon, Double> pokemonMap = SpawnBuilder.buildHeadbuttSpawns(time, weather, "Any", spawns, modifier);
-                    Map<Pokemon, PokemonSpawn> spawnInfoMap = SpawnBuilder.getHeadbuttSpawnInfo(time, weather, "Any", spawns);
+                    Map<PokemonSpawn, Double> pokemonMap = PokemonSpawnBuilder.buildHeadbuttSpawns(time, weather, "Any", spawns, modifier);
+                    Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
 
-                    for (Map.Entry<Pokemon, Double> pEntry : pokemonMap.entrySet()) {
+                    for (Map.Entry<PokemonSpawn, Double> pEntry : pokemonMap.entrySet()) {
 
                         if (RandomHelper.getRandomChance(pEntry.getValue())) {
 
-                            Pokemon poke = pEntry.getKey();
+                            Pokemon poke = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(pEntry.getKey());
+                            mapForHustle.put(poke, pEntry.getKey());
                             if (Intimidate.applies(playersPokemon) || KeenEye.applies(playersPokemon)) {
 
                                 poke = Intimidate.tryIntimidate(poke, playersPokemon);
@@ -695,7 +738,7 @@ public class HeadbuttSpawner {
                             int level = poke.getPokemonLevel();
                             if (Hustle.applies(playersPokemon) || Pressure.applies(playersPokemon) || VitalSpirit.applies(playersPokemon)) {
 
-                                level = Hustle.tryHustle(level, spawnInfoMap.get(poke));
+                                level = Hustle.tryHustle(level, mapForHustle.get(poke));
 
                             }
                             poke.setLevel(level);
@@ -711,6 +754,28 @@ public class HeadbuttSpawner {
 
                                     // we're just gonna spawn the Pokemon on the player to avoid having to do RNGs and maths and shit
                                     PixelmonEntity pixelmon = spawnEvent.getToSpawn().getOrCreatePixelmon(world, x, y, z);
+                                    if (ModList.get().isLoaded("hostilepokemon")) {
+
+                                        HostileManager.tryHostile(mapForHustle.get(poke), pixelmon, player);
+
+                                    }
+                                    if (!pixelmon.getPersistentData().contains("IsHostile")) {
+
+                                        if (ModList.get().isLoaded("totempokemon")) {
+
+                                            TotemManager.tryTotem(mapForHustle.get(poke), pixelmon, player);
+
+                                        } else {
+
+                                            if (ModList.get().isLoaded("titanpokemon")) {
+
+                                                TitanManager.tryTitan(mapForHustle.get(poke), pixelmon, player);
+
+                                            }
+
+                                        }
+
+                                    }
                                     player.world.getServer().deferTask(() -> {
 
                                         player.world.addEntity(pixelmon);

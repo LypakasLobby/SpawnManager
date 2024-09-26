@@ -5,7 +5,6 @@ import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 import com.google.common.reflect.TypeToken;
-import com.lypaka.areamanager.AreaManager;
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.lypakautils.MiscHandlers.ItemStackBuilder;
@@ -131,13 +130,6 @@ public class AllSpawnsMenu {
 
                     List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-All", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
                     ListNBT lore = new ListNBT();
-                    List<String> subAreas = new ArrayList<>();
-                    for (Area a : areas) {
-
-                        subAreas.add(a.getDisplayName());
-
-                    }
-
                     for (String l : displayLore) {
 
                         lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l))));

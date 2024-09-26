@@ -82,6 +82,7 @@ public class AllSpawnsList {
                         String formatting = "&c";
                         if (percent.contains("1")) formatting = "&4&l";
                         if (percent.contains("5")) formatting = "&e&l";
+                        if (percent.contains("30")) formatting = "&c";
                         if (percent.contains("50")) formatting = "&b";
                         if (percent.contains("100")) formatting = "&a";
                         for (String s : entry.getValue()) {
@@ -190,6 +191,7 @@ public class AllSpawnsList {
                         String formatting = "&c";
                         if (percent.contains("1")) formatting = "&4&l";
                         if (percent.contains("5")) formatting = "&e&l";
+                        if (percent.contains("30")) formatting = "&c";
                         if (percent.contains("50")) formatting = "&b";
                         if (percent.contains("100")) formatting = "&a";
                         for (String s : entry.getValue()) {
@@ -295,6 +297,7 @@ public class AllSpawnsList {
                         String formatting = "&c";
                         if (percent.contains("1")) formatting = "&4&l";
                         if (percent.contains("5")) formatting = "&e&l";
+                        if (percent.contains("30")) formatting = "&c";
                         if (percent.contains("50")) formatting = "&b";
                         if (percent.contains("100")) formatting = "&a";
                         for (String s : entry.getValue()) {
@@ -401,6 +404,7 @@ public class AllSpawnsList {
                         String formatting = "&c";
                         if (percent.contains("1")) formatting = "&4&l";
                         if (percent.contains("5")) formatting = "&e&l";
+                        if (percent.contains("30")) formatting = "&c";
                         if (percent.contains("50")) formatting = "&b";
                         if (percent.contains("100")) formatting = "&a";
                         for (String s : entry.getValue()) {
@@ -506,6 +510,7 @@ public class AllSpawnsList {
                         String formatting = "&c";
                         if (percent.contains("1")) formatting = "&4&l";
                         if (percent.contains("5")) formatting = "&e&l";
+                        if (percent.contains("30")) formatting = "&c";
                         if (percent.contains("50")) formatting = "&b";
                         if (percent.contains("100")) formatting = "&a";
                         for (String s : entry.getValue()) {
@@ -606,6 +611,7 @@ public class AllSpawnsList {
                         String formatting = "&c";
                         if (percent.contains("1")) formatting = "&4&l";
                         if (percent.contains("5")) formatting = "&e&l";
+                        if (percent.contains("30")) formatting = "&c";
                         if (percent.contains("50")) formatting = "&b";
                         if (percent.contains("100")) formatting = "&a";
                         for (String s : entry.getValue()) {

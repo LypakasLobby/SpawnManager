@@ -5,7 +5,6 @@ import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 import com.google.common.reflect.TypeToken;
-import com.lypaka.areamanager.AreaManager;
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.lypakautils.MiscHandlers.ItemStackBuilder;

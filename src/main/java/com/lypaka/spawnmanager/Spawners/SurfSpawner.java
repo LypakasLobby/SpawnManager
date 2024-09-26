@@ -2,8 +2,6 @@ package com.lypaka.spawnmanager.Spawners;
 
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Areas.AreaHandler;
-import com.lypaka.hostilepokemon.API.SetHostileEvent;
-import com.lypaka.hostilepokemon.HostilePokemon;
 import com.lypaka.lypakautils.API.PlayerMovementEvent;
 import com.lypaka.lypakautils.FancyText;
 import com.lypaka.spawnmanager.API.AreaSurfSpawnEvent;
@@ -12,9 +10,11 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
+import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
+import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.lypaka.spawnmanager.Utils.HostileManager;
-import com.lypaka.spawnmanager.Utils.SpawnBuilder;
+import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
@@ -26,17 +26,14 @@ import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipan
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
 import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SurfSpawner {
 
@@ -114,15 +111,17 @@ public class SurfSpawner {
                     AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                     if (spawns.getSurfSpawns().size() > 0) {
 
-                        Map<Pokemon, Double> pokemon = SpawnBuilder.buildSurfSpawnsList(time, weather, spawns, modifier);
-                        Map<Pokemon, PokemonSpawn> spawnInfoMap = SpawnBuilder.getPokemonSurfSpawnInfo(time, weather, spawns);
-                        for (Map.Entry<Pokemon, Double> p : pokemon.entrySet()) {
+                        Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildSurfSpawnsList(time, weather, spawns, modifier);
+                        Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
+
+                        for (Map.Entry<PokemonSpawn, Double> p : pokemon.entrySet()) {
 
                             if (toSpawn == null) {
 
                                 if (RandomHelper.getRandomChance(p.getValue())) {
 
-                                    toSpawn = p.getKey();
+                                    toSpawn = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(p.getKey());
+                                    mapForHustle.put(toSpawn, p.getKey());
                                     break;
 
                                 }
@@ -177,7 +176,7 @@ public class SurfSpawner {
                             int level = toSpawn.getPokemonLevel();
                             if (Hustle.applies(playersPokemon) || Pressure.applies(playersPokemon) || VitalSpirit.applies(playersPokemon)) {
 
-                                level = Hustle.tryHustle(level, spawnInfoMap.get(toSpawn));
+                                level = Hustle.tryHustle(level, mapForHustle.get(toSpawn));
 
                             }
                             toSpawn.setLevel(level);
@@ -194,14 +193,31 @@ public class SurfSpawner {
                             if (areasAtSpawn.size() == 0) continue;
                             PixelmonEntity pixelmon = toSpawn.getOrCreatePixelmon(world, spawnX, spawnY + 1.5, spawnZ);
                             Pokemon finalToSpawn = toSpawn;
-                            if (spawnInfoMap.get(toSpawn).isHostile()) {
-
-                                HostileManager.setHostile(pixelmon, player);
-
-                            }
                             player.world.getServer().deferTask(() -> {
 
                                 pixelmon.setSpawnLocation(pixelmon.getDefaultSpawnLocation());
+                                if (ModList.get().isLoaded("hostilepokemon")) {
+
+                                    HostileManager.tryHostile(mapForHustle.get(finalToSpawn), pixelmon, player);
+
+                                }
+                                if (!pixelmon.getPersistentData().contains("IsHostile")) {
+
+                                    if (ModList.get().isLoaded("totempokemon")) {
+
+                                        TotemManager.tryTotem(mapForHustle.get(finalToSpawn), pixelmon, player);
+
+                                    } else {
+
+                                        if (ModList.get().isLoaded("titanpokemon")) {
+
+                                            TitanManager.tryTitan(mapForHustle.get(finalToSpawn), pixelmon, player);
+
+                                        }
+
+                                    }
+
+                                }
                                 player.world.addEntity(pixelmon);
                                 if (spawnArea.getSurfSpawnerSettings().doesDespawnAfterBattle()) {
 

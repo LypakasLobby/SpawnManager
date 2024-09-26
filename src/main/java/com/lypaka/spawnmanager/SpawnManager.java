@@ -21,6 +21,11 @@ public class SpawnManager {
     public static final Logger logger = LogManager.getLogger("SpawnManager");
     public static BasicConfigManager configManager;
 
+    // TODO
+    // Rewrite how the spawners generate their list of possible spawns to fix NullPointers  -- DONE
+    // Add optional support of Totem Pokemon and Titan Pokemon                              -- DONE
+    // Check for updates on the held items                                                  -- DONE
+
     public SpawnManager() throws IOException, ObjectMappingException {
 
         Path dir = ConfigUtils.checkDir(Paths.get("./config/spawnmanager"));
