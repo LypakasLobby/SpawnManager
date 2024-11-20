@@ -29,7 +29,7 @@ public class NaturalPixelmonSpawnListener {
             if (event.action.getOrCreateEntity() instanceof PixelmonEntity) {
 
                 PixelmonEntity pixelmon = (PixelmonEntity) event.action.getOrCreateEntity();
-                if (!FishSpawner.fishSpawnerMap.containsKey(pixelmon.getUniqueID())) {
+                try {
 
                     if (spawnArea.getNaturalSpawnerSettings().doesPreventPixelmonSpawns()) {
 
@@ -37,6 +37,10 @@ public class NaturalPixelmonSpawnListener {
                         return;
 
                     }
+
+                } catch (NullPointerException e) {
+
+
 
                 }
 
