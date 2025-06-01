@@ -1,13 +1,13 @@
 package com.lypaka.spawnmanager.Utils.ExternalAbilities;
 
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import com.cobblemon.mod.common.pokemon.Pokemon;
 
 public class SuperLuck {
 
     public static boolean applies (Pokemon pokemon) {
 
         if (pokemon == null) return false;
-        return pokemon.getAbility().getLocalizedName().equalsIgnoreCase("SuperLuck") || pokemon.getAbility().getLocalizedName().equalsIgnoreCase("Super Luck");
+        return pokemon.getAbility().getName().equalsIgnoreCase("SuperLuck") || pokemon.getAbility().getName().equalsIgnoreCase("Super Luck");
 
     }
 

@@ -1,21 +1,25 @@
 package com.lypaka.spawnmanager.Listeners;
 
-import com.lypaka.areamanager.API.FinishedLoadingEvent;
+import com.lypaka.areamanager.API.FinishedLoadingCallback;
+import com.lypaka.shadow.configurate.objectmapping.ObjectMappingException;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
-import com.lypaka.spawnmanager.SpawnManager;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 
-@Mod.EventBusSubscriber(modid = SpawnManager.MOD_ID)
-public class LoadListener {
+public class LoadListener implements FinishedLoadingCallback {
 
-    @SubscribeEvent
-    public static void onAreaLoad (FinishedLoadingEvent event) throws IOException, ObjectMappingException {
+    @Override
+    public void onFinishedLoading() {
 
-        SpawnAreaHandler.loadAreas();
+        try {
+
+            SpawnAreaHandler.loadAreas();
+
+        } catch (IOException | ObjectMappingException e) {
+
+            throw new RuntimeException(e);
+
+        }
 
     }
 

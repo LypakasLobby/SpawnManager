@@ -1,16 +1,16 @@
 package com.lypaka.spawnmanager.SpawnAreas;
 
-import com.google.common.reflect.TypeToken;
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.areamanager.Regions.Region;
 import com.lypaka.areamanager.Regions.RegionHandler;
 import com.lypaka.lypakautils.ConfigurationLoaders.BasicConfigManager;
 import com.lypaka.lypakautils.ConfigurationLoaders.ComplexConfigManager;
 import com.lypaka.lypakautils.ConfigurationLoaders.ConfigUtils;
+import com.lypaka.shadow.configurate.objectmapping.ObjectMappingException;
+import com.lypaka.shadow.google.common.reflect.TypeToken;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnerSettings.*;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.*;
 import com.lypaka.spawnmanager.SpawnManager;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,6 +28,7 @@ public class SpawnAreaHandler {
 
     public static void loadAreas() throws IOException, ObjectMappingException {
 
+        SpawnManager.logger.info("[SpawnManager] Loading data..");
         areasWithNaturalSpawns = 0;
         String[] files = new String[]{"settings.conf"};
         for (Map.Entry<String, Region> regionMap : RegionHandler.regionMap.entrySet()) {
@@ -111,7 +112,7 @@ public class SpawnAreaHandler {
                     String form = fcm.getConfigNode(i, "Pokemon-Data", "Form").getString();
                     int minLevel = fcm.getConfigNode(i, "Pokemon-Data", "Min-Level").getInt();
                     int maxLevel = fcm.getConfigNode(i, "Pokemon-Data", "Max-Level").getInt();
-                    Map<String, Map<String, Map<String, Map<String, String>>>> spawnData = fcm.getConfigNode(i, "Spawn-Data").getValue(new TypeToken<Map<String, Map<String, Map<String, Map<String, String>>>>>() {});
+                    Map<String, Map<String, Map<String, String>>> spawnData = fcm.getConfigNode(i, "Spawn-Data").getValue(new TypeToken<Map<String, Map<String, Map<String, String>>>>() {});
 
                     FishSpawn fishSpawn = new FishSpawn(species, form, minLevel, maxLevel, spawnData);
                     fishSpawnsList.add(fishSpawn);
@@ -169,7 +170,7 @@ public class SpawnAreaHandler {
 
                 }
 
-                if (naturalSpawnsList.size() > 0) {
+                if (!naturalSpawnsList.isEmpty()) {
 
                     areasWithNaturalSpawns++;
 

@@ -1,22 +1,22 @@
 package com.lypaka.spawnmanager.Commands;
 
+import com.lypaka.shadow.configurate.objectmapping.ObjectMappingException;
 import com.lypaka.spawnmanager.GUIs.MainMenu;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class MenuCommand {
 
-    public MenuCommand(CommandDispatcher<CommandSource> dispatcher) {
+    public MenuCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
 
         for (String a : SpawnManagerCommand.ALIASES) {
 
             dispatcher.register(
-                    Commands.literal(a)
+                    CommandManager.literal(a)
                             .then(
-                                    Commands.literal("menu")
+                                    CommandManager.literal("menu")
                                             .executes(c -> {
 
                                                 if (c.getSource().getEntity() instanceof ServerPlayerEntity) {

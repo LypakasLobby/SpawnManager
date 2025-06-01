@@ -1,10 +1,10 @@
 package com.lypaka.spawnmanager.Utils.ExternalAbilities;
 
+import com.cobblemon.mod.common.api.types.ElementalTypes;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.lypaka.lypakautils.Handlers.RandomHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
-import com.pixelmonmod.pixelmon.api.pokemon.Element;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
 
 import java.util.*;
 
@@ -13,19 +13,19 @@ public class Harvest {
     public static boolean applies (Pokemon pokemon) {
 
         if (pokemon == null) return false;
-        return pokemon.getAbility().getLocalizedName().equalsIgnoreCase("Harvest");
+        return pokemon.getAbility().getName().equalsIgnoreCase("Harvest");
 
     }
 
     public static Pokemon tryHarvest (Pokemon originalSpawn, Map<PokemonSpawn, Double> possibleSpawns) {
 
-        if (!RandomHelper.getRandomChance(50)) return originalSpawn;
+        if (!RandomHandler.getRandomChance(50)) return originalSpawn;
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
         Map<UUID, PokemonSpawn> m1 = new HashMap<>();
         Map<Double, UUID> m2 = new HashMap<>();
         for (Map.Entry<PokemonSpawn, Double> entry : possibleSpawns.entrySet()) {
 
-            if (entry.getKey().getTypes().contains(Element.GRASS)) {
+            if (entry.getKey().getTypes().contains(ElementalTypes.INSTANCE.getGRASS())) {
 
                 if (!pokemonMap.containsKey(entry.getKey())) {
 
@@ -40,13 +40,13 @@ public class Harvest {
 
         }
 
-        if (pokemonMap.size() > 0) {
+        if (!pokemonMap.isEmpty()) {
 
             List<Double> chances = new ArrayList<>(m2.keySet());
             for (int i = chances.size() - 1; i >= 0; i--) {
 
                 double chance = chances.get(i);
-                if (RandomHelper.getRandomChance(chance)) {
+                if (RandomHandler.getRandomChance(chance)) {
 
                     UUID uuid = m2.get(chance);
                     return PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(m1.get(uuid));

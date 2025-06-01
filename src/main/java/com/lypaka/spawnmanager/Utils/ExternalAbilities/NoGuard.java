@@ -1,13 +1,13 @@
 package com.lypaka.spawnmanager.Utils.ExternalAbilities;
 
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import com.cobblemon.mod.common.pokemon.Pokemon;
 
 public class NoGuard {
 
     public static boolean applies (Pokemon pokemon) {
 
         if (pokemon == null) return false;
-        return pokemon.getAbility().getLocalizedName().equalsIgnoreCase("NoGuard") || pokemon.getAbility().getLocalizedName().equalsIgnoreCase("No Guard");
+        return pokemon.getAbility().getName().equalsIgnoreCase("NoGuard") || pokemon.getAbility().getName().equalsIgnoreCase("No Guard");
 
     }
 

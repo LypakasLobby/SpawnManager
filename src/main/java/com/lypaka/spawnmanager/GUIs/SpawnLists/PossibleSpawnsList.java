@@ -1,16 +1,15 @@
 package com.lypaka.spawnmanager.GUIs.SpawnLists;
 
-import com.lypaka.lypakautils.FancyText;
+import com.cobblemon.mod.common.item.PokemonItem;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.lypaka.lypakautils.Handlers.FancyTextHandler;
 import com.lypaka.spawnmanager.ConfigGetters;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.*;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
-import com.pixelmonmod.pixelmon.api.util.helpers.SpriteItemHelper;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.text.Text;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -24,12 +23,12 @@ public class PossibleSpawnsList {
 
         for (NaturalSpawn natural : spawns.getNaturalSpawns()) {
 
-            String speciesName = natural.getSpecies();
+            String speciesName = natural.getSpeciesName();
             String form = natural.getForm();
-            Pokemon p = PokemonBuilder.builder().species(speciesName).build();
+            Pokemon p = natural.buildAndGetPokemon();
             if (!form.equalsIgnoreCase("default")) {
 
-                p.setForm(form);
+                p.setForm(natural.getSpecies().getFormByName(form));
 
             }
             String levelRange = natural.getMinLevel() + " - " + natural.getMaxLevel();
@@ -52,10 +51,9 @@ public class PossibleSpawnsList {
                                 double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
                                 DecimalFormat df = new DecimalFormat("#.##");
                                 String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
-                                ItemStack sprite = SpriteItemHelper.getPhoto(p);
-                                sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                                ItemStack sprite = PokemonItem.from(p);
+                                sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                                 List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
-                                configLore.removeIf(e -> e.contains("Rod Types"));
                                 configLore.removeIf(e -> e.contains("Wood Types"));
                                 configLore.removeIf(e -> e.contains("Stone Types"));
                                 configLore.removeIf(e -> e.contains("Time")); // removing time, weather and location because that information is irrelevent here
@@ -90,7 +88,7 @@ public class PossibleSpawnsList {
                                             if (percent.contains("100")) formatting = "&a";
                                             for (String s : entry.getValue()) {
 
-                                                heldItems.add(FancyText.getFormattedString(formatting + percent + " -> " + s));
+                                                heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
 
                                             }
 
@@ -98,28 +96,28 @@ public class PossibleSpawnsList {
 
                                     } else {
 
-                                        heldItems.add(FancyText.getFormattedString("&cNone"));
+                                        heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
 
                                     }
                                     configLore.addAll(heldItems);
 
                                 }
-                                ListNBT lore = new ListNBT();
+                                List<Text> lore = new ArrayList<>();
                                 for (String l : configLore) {
 
-                                    lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l
+                                    lore.add(FancyTextHandler.getFormattedText(l
                                             .replace("%form%", form)
                                             .replace("%levelRange%", levelRange)
                                             .replace("%spawner%", "Natural Spawner")
                                             .replace("%spawnChance%", spawnChanceDisplay)
-                                    ))));
+                                    ));
 
                                 }
-                                sprite.getOrCreateChildTag("display").put("Lore", lore);
+                                sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
                                 UUID rand = UUID.randomUUID();
                                 m1.put(rand, p);
                                 m2.put(p, sprite);
-                                m3.put(p.getSpecies().getDex(), rand);
+                                m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
 
                             }
 
@@ -139,111 +137,104 @@ public class PossibleSpawnsList {
 
         for (FishSpawn fish : spawns.getFishSpawns()) {
 
-            String speciesName = fish.getSpecies();
+            String speciesName = fish.getSpeciesName();
             String form = fish.getForm();
-            Pokemon p = PokemonBuilder.builder().species(speciesName).build();
+            Pokemon p = fish.buildAndGetPokemon();
             if (!form.equalsIgnoreCase("default")) {
 
-                p.setForm(form);
+                p.setForm(fish.getSpecies().getFormByName(form));
 
             }
             List<String> rodList = new ArrayList<>();
             String levelRange = fish.getMinLevel() + " - " + fish.getMaxLevel();
-            Map<String, Map<String, Map<String, Map<String, String>>>> data = fish.getSpawnData();
-            for (Map.Entry<String, Map<String, Map<String, Map<String, String>>>> d1 : data.entrySet()) {
+            Map<String, Map<String, Map<String, String>>> data = fish.getSpawnData();
+            for (Map.Entry<String, Map<String, Map<String, String>>> d1 : data.entrySet()) {
 
-                String rod = d1.getKey();
-                rodList.add(rod);
-                Map<String, Map<String, Map<String, String>>> data2 = d1.getValue();
-                for (Map.Entry<String, Map<String, Map<String, String>>> d2 : data2.entrySet()) {
+                String time = d1.getKey();
+                if (time.equalsIgnoreCase(playerTime) || time.equalsIgnoreCase("Any")) {
 
-                    String time = d2.getKey();
-                    if (time.equalsIgnoreCase(playerTime) || time.equalsIgnoreCase("Any")) {
+                    Map<String, Map<String, String>> data2 = d1.getValue();
+                    for (Map.Entry<String, Map<String, String>> d2 : data2.entrySet()) {
+                        
+                        String weather = d2.getKey();
+                        if (weather.equalsIgnoreCase(playerWeather) || weather.equalsIgnoreCase("Any")) {
 
-                        Map<String, Map<String, String>> data3 = d2.getValue();
-                        for (Map.Entry<String, Map<String, String>> d3 : data3.entrySet()) {
+                            double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
+                            ItemStack sprite = PokemonItem.from(p);
+                            sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                            List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
+                            configLore.removeIf(e -> e.contains("Location"));
+                            configLore.removeIf(e -> e.contains("Wood Types"));
+                            configLore.removeIf(e -> e.contains("Stone Types"));
+                            configLore.removeIf(e -> e.contains("Time")); // removing time, weather and location because that information is irrelevent here
+                            configLore.removeIf(e -> e.contains("Weather"));
+                            configLore.removeIf(e -> e.contains("Location"));
+                            List<String> heldItems = new ArrayList<>();
+                            boolean doHeldItems = false;
+                            for (String s : configLore) {
 
-                            String weather = d3.getKey();
-                            if (weather.equalsIgnoreCase(playerWeather) || weather.equalsIgnoreCase("Any")) {
+                                if (s.contains("%heldItems%")) {
 
-                                double spawnChance = Double.parseDouble(d3.getValue().get("Spawn-Chance"));
-                                DecimalFormat df = new DecimalFormat("#.##");
-                                String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
-                                ItemStack sprite = SpriteItemHelper.getPhoto(p);
-                                sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
-                                List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
-                                configLore.removeIf(e -> e.contains("Location"));
-                                configLore.removeIf(e -> e.contains("Wood Types"));
-                                configLore.removeIf(e -> e.contains("Stone Types"));
-                                configLore.removeIf(e -> e.contains("Time")); // removing time, weather and location because that information is irrelevent here
-                                configLore.removeIf(e -> e.contains("Weather"));
-                                configLore.removeIf(e -> e.contains("Location"));
-                                List<String> heldItems = new ArrayList<>();
-                                boolean doHeldItems = false;
-                                for (String s : configLore) {
-
-                                    if (s.contains("%heldItems%")) {
-
-                                        doHeldItems = true;
-                                        break;
-
-                                    }
+                                    doHeldItems = true;
+                                    break;
 
                                 }
-                                if (doHeldItems) {
 
-                                    configLore.removeIf(e -> e.contains("%heldItems%"));
-                                    if (HeldItemUtils.heldItemMap.containsKey(speciesName.toLowerCase())) {
+                            }
+                            if (doHeldItems) {
 
-                                        Map<String, List<String>> possibleItems = HeldItemUtils.heldItemMap.get(speciesName.toLowerCase());
-                                        for (Map.Entry<String, List<String>> entry : possibleItems.entrySet()) {
+                                configLore.removeIf(e -> e.contains("%heldItems%"));
+                                if (HeldItemUtils.heldItemMap.containsKey(speciesName.toLowerCase())) {
 
-                                            String percent = entry.getKey();
-                                            String formatting = "&c";
-                                            if (percent.contains("1")) formatting = "&4&l";
-                                            if (percent.contains("5")) formatting = "&e&l";
-                                            if (percent.contains("50")) formatting = "&b";
-                                            if (percent.contains("100")) formatting = "&a";
-                                            for (String s : entry.getValue()) {
+                                    Map<String, List<String>> possibleItems = HeldItemUtils.heldItemMap.get(speciesName.toLowerCase());
+                                    for (Map.Entry<String, List<String>> entry : possibleItems.entrySet()) {
 
-                                                heldItems.add(FancyText.getFormattedString(formatting + percent + " -> " + s));
+                                        String percent = entry.getKey();
+                                        String formatting = "&c";
+                                        if (percent.contains("1")) formatting = "&4&l";
+                                        if (percent.contains("5")) formatting = "&e&l";
+                                        if (percent.contains("50")) formatting = "&b";
+                                        if (percent.contains("100")) formatting = "&a";
+                                        for (String s : entry.getValue()) {
 
-                                            }
+                                            heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
 
                                         }
 
-                                    } else {
-
-                                        heldItems.add(FancyText.getFormattedString("&cNone"));
-
                                     }
-                                    configLore.addAll(heldItems);
+
+                                } else {
+
+                                    heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
 
                                 }
-                                ListNBT lore = new ListNBT();
-                                for (String l : configLore) {
-
-                                    lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l
-                                            .replace("%form%", form)
-                                            .replace("%levelRange%", levelRange)
-                                            .replace("%spawner%", "Fish Spawner")
-                                            .replace("%rodTypes%", String.join(", ", rodList))
-                                            .replace("%spawnChance%", spawnChanceDisplay)
-                                    ))));
-
-                                }
-                                sprite.getOrCreateChildTag("display").put("Lore", lore);
-                                UUID rand = UUID.randomUUID();
-                                m1.put(rand, p);
-                                m2.put(p, sprite);
-                                m3.put(p.getSpecies().getDex(), rand);
+                                configLore.addAll(heldItems);
 
                             }
+                            List<Text> lore = new ArrayList<>();
+                            for (String l : configLore) {
+
+                                lore.add(FancyTextHandler.getFormattedText(l
+                                        .replace("%form%", form)
+                                        .replace("%levelRange%", levelRange)
+                                        .replace("%spawner%", "Fish Spawner")
+                                        .replace("%rodTypes%", String.join(", ", rodList))
+                                        .replace("%spawnChance%", spawnChanceDisplay)
+                                ));
+
+                            }
+                            sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
+                            UUID rand = UUID.randomUUID();
+                            m1.put(rand, p);
+                            m2.put(p, sprite);
+                            m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
 
                         }
-
+                        
                     }
-
+                    
                 }
 
             }
@@ -256,12 +247,12 @@ public class PossibleSpawnsList {
 
         for (HeadbuttSpawn headbutt : spawns.getHeadbuttSpawns()) {
 
-            String speciesName = headbutt.getSpecies();
+            String speciesName = headbutt.getSpeciesName();
             String form = headbutt.getForm();
-            Pokemon p = PokemonBuilder.builder().species(speciesName).build();
+            Pokemon p = headbutt.buildAndGetPokemon();
             if (!form.equalsIgnoreCase("default")) {
 
-                p.setForm(form);
+                p.setForm(headbutt.getSpecies().getFormByName(form));
 
             }
             List<String> woodTypes = new ArrayList<>();
@@ -284,8 +275,8 @@ public class PossibleSpawnsList {
                             double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
                             DecimalFormat df = new DecimalFormat("#.##");
                             String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
-                            ItemStack sprite = SpriteItemHelper.getPhoto(p);
-                            sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                            ItemStack sprite = PokemonItem.from(p);
+                            sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                             List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
                             configLore.removeIf(e -> e.contains("Location"));
                             configLore.removeIf(e -> e.contains("Rod Types"));
@@ -322,7 +313,7 @@ public class PossibleSpawnsList {
                                         if (percent.contains("100")) formatting = "&a";
                                         for (String s : entry.getValue()) {
 
-                                            heldItems.add(FancyText.getFormattedString(formatting + percent + " -> " + s));
+                                            heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
 
                                         }
 
@@ -330,29 +321,29 @@ public class PossibleSpawnsList {
 
                                 } else {
 
-                                    heldItems.add(FancyText.getFormattedString("&cNone"));
+                                    heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
 
                                 }
                                 configLore.addAll(heldItems);
 
                             }
-                            ListNBT lore = new ListNBT();
+                            List<Text> lore = new ArrayList<>();
                             for (String l : configLore) {
 
-                                lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l
+                                lore.add(FancyTextHandler.getFormattedText(l
                                         .replace("%form%", form)
                                         .replace("%levelRange%", levelRange)
                                         .replace("%spawner%", "Headbutt Spawner")
                                         .replace("%woodTypes%", String.join("\n", woodTypes))
                                         .replace("%spawnChance%", spawnChanceDisplay)
-                                ))));
+                                ));
 
                             }
-                            sprite.getOrCreateChildTag("display").put("Lore", lore);
+                            sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
                             UUID rand = UUID.randomUUID();
                             m1.put(rand, p);
                             m2.put(p, sprite);
-                            m3.put(p.getSpecies().getDex(), rand);
+                            m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
 
                         }
 
@@ -370,12 +361,12 @@ public class PossibleSpawnsList {
 
         for (RockSmashSpawn rock : spawns.getRockSmashSpawns()) {
 
-            String speciesName = rock.getSpecies();
+            String speciesName = rock.getSpeciesName();
             String form = rock.getForm();
-            Pokemon p = PokemonBuilder.builder().species(speciesName).build();
+            Pokemon p = rock.buildAndGetPokemon();
             if (!form.equalsIgnoreCase("default")) {
 
-                p.setForm(form);
+                p.setForm(rock.getSpecies().getFormByName(form));
 
             }
             List<String> stoneTypes = new ArrayList<>();
@@ -398,8 +389,8 @@ public class PossibleSpawnsList {
                             double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
                             DecimalFormat df = new DecimalFormat("#.##");
                             String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
-                            ItemStack sprite = SpriteItemHelper.getPhoto(p);
-                            sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                            ItemStack sprite = PokemonItem.from(p);
+                            sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.allSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                             List<String> configLore = new ArrayList<>(ConfigGetters.allSpawnsMenuFormatLore);
                             configLore.removeIf(e -> e.contains("Location"));
                             configLore.removeIf(e -> e.contains("Rod Types"));
@@ -436,7 +427,7 @@ public class PossibleSpawnsList {
                                         if (percent.contains("100")) formatting = "&a";
                                         for (String s : entry.getValue()) {
 
-                                            heldItems.add(FancyText.getFormattedString(formatting + percent + " -> " + s));
+                                            heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
 
                                         }
 
@@ -444,29 +435,29 @@ public class PossibleSpawnsList {
 
                                 } else {
 
-                                    heldItems.add(FancyText.getFormattedString("&cNone"));
+                                    heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
 
                                 }
                                 configLore.addAll(heldItems);
 
                             }
-                            ListNBT lore = new ListNBT();
+                            List<Text> lore = new ArrayList<>();
                             for (String l : configLore) {
 
-                                lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l
+                                lore.add(FancyTextHandler.getFormattedText(l
                                         .replace("%form%", form)
                                         .replace("%levelRange%", levelRange)
                                         .replace("%spawner%", "Rock Smash Spawner")
                                         .replace("%stoneTypes%", String.join("\n", stoneTypes))
                                         .replace("%spawnChance%", spawnChanceDisplay)
-                                ))));
+                                ));
 
                             }
-                            sprite.getOrCreateChildTag("display").put("Lore", lore);
+                            sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
                             UUID rand = UUID.randomUUID();
                             m1.put(rand, p);
                             m2.put(p, sprite);
-                            m3.put(p.getSpecies().getDex(), rand);
+                            m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
 
                         }
 
@@ -484,12 +475,12 @@ public class PossibleSpawnsList {
 
         for (GrassSpawn grass : spawns.getGrassSpawns()) {
 
-            String speciesName = grass.getSpecies();
+            String speciesName = grass.getSpeciesName();
             String form = grass.getForm();
-            Pokemon p = PokemonBuilder.builder().species(speciesName).build();
+            Pokemon p = grass.buildAndGetPokemon();
             if (!form.equalsIgnoreCase("default")) {
 
-                p.setForm(form);
+                p.setForm(grass.getSpecies().getFormByName(form));
 
             }
             String levelRange = grass.getMinLevel() + " - " + grass.getMaxLevel();
@@ -512,8 +503,8 @@ public class PossibleSpawnsList {
                                 double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
                                 DecimalFormat df = new DecimalFormat("#.##");
                                 String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
-                                ItemStack sprite = SpriteItemHelper.getPhoto(p);
-                                sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                                ItemStack sprite = PokemonItem.from(p);
+                                sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                                 List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
                                 configLore.removeIf(e -> e.contains("Rod Types"));
                                 configLore.removeIf(e -> e.contains("Wood Types"));
@@ -550,7 +541,7 @@ public class PossibleSpawnsList {
                                             if (percent.contains("100")) formatting = "&a";
                                             for (String s : entry.getValue()) {
 
-                                                heldItems.add(FancyText.getFormattedString(formatting + percent + " -> " + s));
+                                                heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
 
                                             }
 
@@ -558,28 +549,28 @@ public class PossibleSpawnsList {
 
                                     } else {
 
-                                        heldItems.add(FancyText.getFormattedString("&cNone"));
+                                        heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
 
                                     }
                                     configLore.addAll(heldItems);
 
                                 }
-                                ListNBT lore = new ListNBT();
+                                List<Text> lore = new ArrayList<>();
                                 for (String l : configLore) {
 
-                                    lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l
+                                    lore.add(FancyTextHandler.getFormattedText(l
                                             .replace("%form%", form)
                                             .replace("%levelRange%", levelRange)
                                             .replace("%spawner%", "Grass Spawner")
                                             .replace("%spawnChance%", spawnChanceDisplay)
-                                    ))));
+                                    ));
 
                                 }
-                                sprite.getOrCreateChildTag("display").put("Lore", lore);
+                                sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
                                 UUID rand = UUID.randomUUID();
                                 m1.put(rand, p);
                                 m2.put(p, sprite);
-                                m3.put(p.getSpecies().getDex(), rand);
+                                m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
 
                             }
 
@@ -599,12 +590,12 @@ public class PossibleSpawnsList {
 
         for (SurfSpawn surf : spawns.getSurfSpawns()) {
 
-            String speciesName = surf.getSpecies();
+            String speciesName = surf.getSpeciesName();
             String form = surf.getForm();
-            Pokemon p = PokemonBuilder.builder().species(speciesName).build();
+            Pokemon p = surf.buildAndGetPokemon();
             if (!form.equalsIgnoreCase("default")) {
 
-                p.setForm(form);
+                p.setForm(surf.getSpecies().getFormByName(form));
 
             }
             String levelRange = surf.getMinLevel() + " - " + surf.getMaxLevel();
@@ -623,8 +614,8 @@ public class PossibleSpawnsList {
                             double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
                             DecimalFormat df = new DecimalFormat("#.##");
                             String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
-                            ItemStack sprite = SpriteItemHelper.getPhoto(p);
-                            sprite.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                            ItemStack sprite = PokemonItem.from(p);
+                            sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
                             List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
                             configLore.removeIf(e -> e.contains("Rod Types"));
                             configLore.removeIf(e -> e.contains("Wood Types"));
@@ -661,7 +652,7 @@ public class PossibleSpawnsList {
                                         if (percent.contains("100")) formatting = "&a";
                                         for (String s : entry.getValue()) {
 
-                                            heldItems.add(FancyText.getFormattedString(formatting + percent + " -> " + s));
+                                            heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
 
                                         }
 
@@ -669,28 +660,28 @@ public class PossibleSpawnsList {
 
                                 } else {
 
-                                    heldItems.add(FancyText.getFormattedString("&cNone"));
+                                    heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
 
                                 }
                                 configLore.addAll(heldItems);
 
                             }
-                            ListNBT lore = new ListNBT();
+                            List<Text> lore = new ArrayList<>();
                             for (String l : configLore) {
 
-                                lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l
+                                lore.add(FancyTextHandler.getFormattedText(l
                                         .replace("%form%", form)
                                         .replace("%levelRange%", levelRange)
                                         .replace("%spawner%", "Surf Spawner")
                                         .replace("%spawnChance%", spawnChanceDisplay)
-                                ))));
+                                ));
 
                             }
-                            sprite.getOrCreateChildTag("display").put("Lore", lore);
+                            sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
                             UUID rand = UUID.randomUUID();
                             m1.put(rand, p);
                             m2.put(p, sprite);
-                            m3.put(p.getSpecies().getDex(), rand);
+                            m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
 
                         }
 

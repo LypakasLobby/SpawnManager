@@ -1,51 +1,18 @@
 package com.lypaka.spawnmanager.Spawners;
 
+import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.lypaka.areamanager.Areas.Area;
-import com.lypaka.areamanager.Areas.AreaHandler;
-import com.lypaka.lypakautils.Listeners.JoinListener;
-import com.lypaka.spawnmanager.API.AreaHeadbuttSpawnEvent;
-import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
-import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
-import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
-import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
-import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
-import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
-import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
-import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
-import com.lypaka.spawnmanager.Utils.HeldItemUtils;
-import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
-import com.pixelmonmod.pixelmon.api.events.PokeBallImpactEvent;
-import com.pixelmonmod.pixelmon.api.events.moveskills.UseMoveSkillEvent;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
-import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
-import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
-import com.pixelmonmod.pixelmon.api.world.WorldTime;
-import com.pixelmonmod.pixelmon.battles.BattleRegistry;
-import com.pixelmonmod.pixelmon.battles.api.rules.BattleRules;
-import com.pixelmonmod.pixelmon.battles.attacks.Attack;
-import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
-import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
-import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
-import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
-import com.pixelmonmod.pixelmon.entities.pixelmon.StatueEntity;
-import com.pixelmonmod.pixelmon.entities.pokeballs.OccupiedPokeBallEntity;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class HeadbuttSpawner {
 
     public static List<UUID> spawnedPokemonUUIDs = new ArrayList<>();
-    public static Map<Area, Map<UUID, List<PixelmonEntity>>> pokemonSpawnedMap = new HashMap<>();
+    public static Map<Area, Map<UUID, List<PokemonEntity>>> pokemonSpawnedMap = new HashMap<>();
 
+    // TODO Come back and completely redesign this somehow.
+
+    /*
     @SubscribeEvent
     public void onPokeBallHit (PokeBallImpactEvent event) {
 
@@ -875,5 +842,7 @@ public class HeadbuttSpawner {
         }
 
     }
+
+     */
 
 }

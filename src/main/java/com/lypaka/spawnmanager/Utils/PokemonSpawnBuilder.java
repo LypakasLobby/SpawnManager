@@ -1,10 +1,8 @@
 package com.lypaka.spawnmanager.Utils;
 
-import com.lypaka.lypakautils.MiscHandlers.PixelmonHelpers;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.lypaka.lypakautils.Handlers.RandomHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.*;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
-import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
 
 import java.util.*;
 
@@ -12,11 +10,10 @@ public class PokemonSpawnBuilder {
 
     public static Pokemon buildPokemonFromPokemonSpawn (PokemonSpawn spawn) {
 
-        int level = RandomHelper.getRandomNumberBetween(spawn.getMinLevel(), spawn.getMaxLevel());
-        Pokemon pokemon = PixelmonHelpers.fixPokemonIVsAndGender(PokemonBuilder.builder().species(spawn.getSpecies()).level(level).build());
+        Pokemon pokemon = spawn.buildAndGetPokemon();
         if (!spawn.getForm().equalsIgnoreCase("")) {
 
-            pokemon.setForm(spawn.getForm());
+            pokemon.setForm(spawn.getSpecies().getFormByName(spawn.getForm()));
 
         }
 
@@ -28,7 +25,7 @@ public class PokemonSpawnBuilder {
 
         List<SurfSpawn> surfSpawns = spawns.getSurfSpawns();
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
-        if (surfSpawns.size() == 0) return pokemonMap;
+        if (surfSpawns.isEmpty()) return pokemonMap;
         Map<Double, List<SurfSpawn>> m2 = new HashMap<>();
         for (SurfSpawn s : surfSpawns) {
 
@@ -64,12 +61,6 @@ public class PokemonSpawnBuilder {
             }
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
-            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
-            double totemChance = data.containsKey("Totem-Chance") ? Double.parseDouble(data.get("Totem-Chance")) : 0;
-            double titanChance = data.containsKey("Titan-Chance") ? Double.parseDouble(data.get("Titan-Chance")) : 0;
-            s.setHostileChance(hostileChance);
-            s.setTotemChance(totemChance);
-            s.setTitanChance(titanChance);
             spawnChance = spawnChance * modifier;
             List<SurfSpawn> list = new ArrayList<>();
             if (m2.containsKey(spawnChance)) {
@@ -87,7 +78,7 @@ public class PokemonSpawnBuilder {
 
         for (int i = chances.size() - 1; i >= 0; i--) {
 
-            if (RandomHelper.getRandomChance(chances.get(i))) {
+            if (RandomHandler.getRandomChance(chances.get(i))) {
 
                 List<SurfSpawn> spawnList = m2.get(chances.get(i));
                 for (SurfSpawn spawn : spawnList) {
@@ -108,7 +99,7 @@ public class PokemonSpawnBuilder {
 
         List<NaturalSpawn> naturalSpawns = spawns.getNaturalSpawns();
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
-        if (naturalSpawns.size() == 0) return pokemonMap;
+        if (naturalSpawns.isEmpty()) return pokemonMap;
         Map<Double, List<NaturalSpawn>> m2 = new HashMap<>();
         int groupSizeMax = 1;
         for (NaturalSpawn n : naturalSpawns) {
@@ -170,17 +161,11 @@ public class PokemonSpawnBuilder {
 
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
-            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
-            double totemChance = data.containsKey("Totem-Chance") ? Double.parseDouble(data.get("Totem-Chance")) : 0;
-            double titanChance = data.containsKey("Titan-Chance") ? Double.parseDouble(data.get("Titan-Chance")) : 0;
             if (data.containsKey("Group-Size")) {
 
                 groupSizeMax = Integer.parseInt(data.get("Group-Size"));
 
             }
-            n.setHostileChance(hostileChance);
-            n.setTotemChance(totemChance);
-            n.setTitanChance(titanChance);
             spawnChance = spawnChance * modifier;
             List<NaturalSpawn> list = new ArrayList<>();
             if (m2.containsKey(spawnChance)) {
@@ -202,12 +187,12 @@ public class PokemonSpawnBuilder {
 
         for (int i = chances.size() - 1; i >= 0; i--) {
 
-            if (RandomHelper.getRandomChance(chances.get(i))) {
+            if (RandomHandler.getRandomChance(chances.get(i))) {
 
                 List<NaturalSpawn> spawnList = m2.get(chances.get(i));
                 for (NaturalSpawn spawn : spawnList) {
 
-                    int groupSize = RandomHelper.getRandomNumberBetween(1, groupSizeMax);
+                    int groupSize = RandomHandler.getRandomNumberBetween(1, groupSizeMax);
                     for (int p = 0; p < groupSize; p++) {
 
                         pokemonMap.put(spawn, chances.get(i));
@@ -229,7 +214,7 @@ public class PokemonSpawnBuilder {
         List<HeadbuttSpawn> headbuttSpawns = spawns.getHeadbuttSpawns();
         Map<Double, List<HeadbuttSpawn>> map = new HashMap<>();
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
-        if (headbuttSpawns.size() == 0) return pokemonMap;
+        if (headbuttSpawns.isEmpty()) return pokemonMap;
         for (HeadbuttSpawn h : headbuttSpawns) {
 
             Map<String, Map<String, Map<String, String>>> spawnData = h.getSpawnData();
@@ -270,12 +255,6 @@ public class PokemonSpawnBuilder {
 
             }
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
-            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
-            double totemChance = data.containsKey("Totem-Chance") ? Double.parseDouble(data.get("Totem-Chance")) : 0;
-            double titanChance = data.containsKey("Titan-Chance") ? Double.parseDouble(data.get("Titan-Chance")) : 0;
-            h.setHostileChance(hostileChance);
-            h.setTotemChance(totemChance);
-            h.setTitanChance(titanChance);
             spawnChance = spawnChance * modifier;
             List<HeadbuttSpawn> list = new ArrayList<>();
             if (map.containsKey(spawnChance)) list = map.get(spawnChance);
@@ -338,7 +317,7 @@ public class PokemonSpawnBuilder {
         List<RockSmashSpawn> rockSmashSpawns = spawns.getRockSmashSpawns();
         Map<Double, List<RockSmashSpawn>> map = new HashMap<>();
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
-        if (rockSmashSpawns.size() == 0) return pokemonMap;
+        if (rockSmashSpawns.isEmpty()) return pokemonMap;
         for (RockSmashSpawn r : rockSmashSpawns) {
 
             Map<String, Map<String, Map<String, String>>> spawnData = r.getSpawnData();
@@ -379,12 +358,6 @@ public class PokemonSpawnBuilder {
 
             }
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance")) * modifier;
-            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
-            double totemChance = data.containsKey("Totem-Chance") ? Double.parseDouble(data.get("Totem-Chance")) : 0;
-            double titanChance = data.containsKey("Titan-Chance") ? Double.parseDouble(data.get("Titan-Chance")) : 0;
-            r.setHostileChance(hostileChance);
-            r.setTotemChance(totemChance);
-            r.setTitanChance(titanChance);
             List<RockSmashSpawn> list = new ArrayList<>();
             if (map.containsKey(spawnChance)) list = map.get(spawnChance);
             if (stoneTypes.equalsIgnoreCase("Any")) {
@@ -440,20 +413,20 @@ public class PokemonSpawnBuilder {
 
     }
 
-    public static Map<PokemonSpawn, Double> buildFishSpawns (String rod, String time, String weather, AreaSpawns spawns, double modifier) {
+    public static Map<PokemonSpawn, Double> buildFishSpawns (String time, String weather, AreaSpawns spawns, double modifier) {
 
         List<FishSpawn> fishSpawns = spawns.getFishSpawns();
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
 
-        if (fishSpawns.size() == 0) return pokemonMap;
+        if (fishSpawns.isEmpty()) return pokemonMap;
         Map<Double, List<FishSpawn>> map = new HashMap<>();
         for (FishSpawn f : fishSpawns) {
 
-            Map<String, Map<String, Map<String, Map<String, String>>>> spawnData = f.getSpawnData();
-            Map<String, Map<String, Map<String, String>>> innerData;
-            if (spawnData.containsKey(rod)) {
+            Map<String, Map<String, Map<String, String>>> spawnData = f.getSpawnData();
+            Map<String, Map<String, String>> innerData;
+            if (spawnData.containsKey(time)) {
 
-                innerData = spawnData.get(rod);
+                innerData = spawnData.get(time);
 
             } else if (spawnData.containsKey("Any")) {
 
@@ -465,29 +438,14 @@ public class PokemonSpawnBuilder {
 
             }
 
-            Map<String, Map<String, String>> innerData2;
-            if (innerData.containsKey(time)) {
+            Map<String, String> data;
+            if (innerData.containsKey(weather)) {
 
-                innerData2 = innerData.get(time);
+                data = innerData.get(weather);
 
             } else if (innerData.containsKey("Any")) {
 
-                innerData2 = innerData.get("Any");
-
-            } else {
-
-                continue;
-
-            }
-
-            Map<String, String> data;
-            if (innerData2.containsKey(weather)) {
-
-                data = innerData2.get(weather);
-
-            } else if (innerData2.containsKey("Any")) {
-
-                data = innerData2.get("Any");
+                data = innerData.get("Any");
 
             } else {
 
@@ -496,12 +454,6 @@ public class PokemonSpawnBuilder {
             }
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
-            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
-            double totemChance = data.containsKey("Totem-Chance") ? Double.parseDouble(data.get("Totem-Chance")) : 0;
-            double titanChance = data.containsKey("Titan-Chance") ? Double.parseDouble(data.get("Titan-Chance")) : 0;
-            f.setHostileChance(hostileChance);
-            f.setTotemChance(totemChance);
-            f.setTitanChance(titanChance);
             spawnChance = spawnChance * modifier;
             List<FishSpawn> list = new ArrayList<>();
             if (map.containsKey(spawnChance)) {
@@ -519,7 +471,7 @@ public class PokemonSpawnBuilder {
 
         for (int i = chances.size() - 1; i >= 0; i--) {
 
-            if (RandomHelper.getRandomChance(chances.get(i))) {
+            if (RandomHandler.getRandomChance(chances.get(i))) {
 
                 List<FishSpawn> spawnList = map.get(chances.get(i));
                 for (FishSpawn spawn : spawnList) {
@@ -540,7 +492,7 @@ public class PokemonSpawnBuilder {
 
         List<GrassSpawn> grassSpawns = spawns.getGrassSpawns();
         Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
-        if (grassSpawns.size() == 0) return pokemonMap;
+        if (grassSpawns.isEmpty()) return pokemonMap;
 
         Map<GrassSpawn, Map<String, String>> m1 = new HashMap<>();
         Map<Double, List<GrassSpawn>> m2 = new HashMap<>();
@@ -603,12 +555,6 @@ public class PokemonSpawnBuilder {
 
 
             double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
-            double hostileChance = data.containsKey("Hostile-Chance") ? Double.parseDouble(data.get("Hostile-Chance")) : 0;
-            double totemChance = data.containsKey("Totem-Chance") ? Double.parseDouble(data.get("Totem-Chance")) : 0;
-            double titanChance = data.containsKey("Titan-Chance") ? Double.parseDouble(data.get("Titan-Chance")) : 0;
-            g.setHostileChance(hostileChance);
-            g.setTotemChance(totemChance);
-            g.setTitanChance(titanChance);
             m1.put(g, data);
             spawnChance = spawnChance * modifier;
             List<GrassSpawn> list = new ArrayList<>();
@@ -627,7 +573,7 @@ public class PokemonSpawnBuilder {
 
         for (int i = chances.size() - 1; i >= 0; i--) {
 
-            if (RandomHelper.getRandomChance(chances.get(i))) {
+            if (RandomHandler.getRandomChance(chances.get(i))) {
 
                 List<GrassSpawn> spawnList = m2.get(chances.get(i));
                 for (GrassSpawn spawn : spawnList) {

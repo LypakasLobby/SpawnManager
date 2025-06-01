@@ -1,6 +1,7 @@
 package com.lypaka.spawnmanager.Listeners;
 
-import com.lypaka.areamanager.API.AreaEvents.AreaLeaveEvent;
+import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
+import com.lypaka.areamanager.API.AreaEvents.AreaLeaveCallback;
 import com.lypaka.areamanager.Areas.Area;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
@@ -8,35 +9,32 @@ import com.lypaka.spawnmanager.Spawners.FishSpawner;
 import com.lypaka.spawnmanager.Spawners.HeadbuttSpawner;
 import com.lypaka.spawnmanager.Spawners.NaturalSpawner;
 import com.lypaka.spawnmanager.Spawners.RockSmashSpawner;
-import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class AreaListener {
+public class AreaListener implements AreaLeaveCallback {
 
-    @SubscribeEvent
-    public void onAreaLeave (AreaLeaveEvent event) {
+    @Override
+    public boolean onPlayerAreaLeave (ServerPlayerEntity player, Area area, boolean b) {
 
-        ServerPlayerEntity player = event.getPlayer();
-        Area area = event.getArea();
         SpawnArea spawnArea = SpawnAreaHandler.areaMap.get(area);
         FishSpawner.pokemonSpawnedMap.entrySet().removeIf(a -> {
 
             if (spawnArea.getFishSpawnerSettings().doesClearSpawns()) {
 
-                Map<UUID, List<PixelmonEntity>> spawns = FishSpawner.pokemonSpawnedMap.get(a.getKey());
-                if (spawns.containsKey(player.getUniqueID())) {
+                Map<UUID, List<PokemonEntity>> spawns = FishSpawner.pokemonSpawnedMap.get(a.getKey());
+                if (spawns.containsKey(player.getUuid())) {
 
-                    List<PixelmonEntity> pokemon = spawns.get(player.getUniqueID());
-                    for (PixelmonEntity entity : pokemon) {
+                    List<PokemonEntity> pokemon = spawns.get(player.getUuid());
+                    for (PokemonEntity entity : pokemon) {
 
-                        if (entity.battleController == null) {
+                        if (!entity.isBattling()) {
 
-                            entity.remove();
+                            entity.remove(Entity.RemovalReason.DISCARDED);
 
                         }
 
@@ -55,15 +53,15 @@ public class AreaListener {
 
             if (spawnArea.getHeadbuttSpawnerSettings().doesClearSpawns()) {
 
-                Map<UUID, List<PixelmonEntity>> spawns = HeadbuttSpawner.pokemonSpawnedMap.get(a.getKey());
-                if (spawns.containsKey(player.getUniqueID())) {
+                Map<UUID, List<PokemonEntity>> spawns = HeadbuttSpawner.pokemonSpawnedMap.get(a.getKey());
+                if (spawns.containsKey(player.getUuid())) {
 
-                    List<PixelmonEntity> pokemon = spawns.get(player.getUniqueID());
-                    for (PixelmonEntity entity : pokemon) {
+                    List<PokemonEntity> pokemon = spawns.get(player.getUuid());
+                    for (PokemonEntity entity : pokemon) {
 
-                        if (entity.battleController == null) {
+                        if (!entity.isBattling()) {
 
-                            entity.remove();
+                            entity.remove(Entity.RemovalReason.DISCARDED);
 
                         }
 
@@ -82,15 +80,15 @@ public class AreaListener {
 
             if (spawnArea.getNaturalSpawnerSettings().doesClearSpawns()) {
 
-                Map<UUID, List<PixelmonEntity>> spawns = NaturalSpawner.pokemonSpawnedMap.get(a.getKey());
-                if (spawns.containsKey(player.getUniqueID())) {
+                Map<UUID, List<PokemonEntity>> spawns = NaturalSpawner.pokemonSpawnedMap.get(a.getKey());
+                if (spawns.containsKey(player.getUuid())) {
 
-                    List<PixelmonEntity> pokemon = spawns.get(player.getUniqueID());
-                    for (PixelmonEntity entity : pokemon) {
+                    List<PokemonEntity> pokemon = spawns.get(player.getUuid());
+                    for (PokemonEntity entity : pokemon) {
 
-                        if (entity.battleController == null) {
+                        if (!entity.isBattling()) {
 
-                            entity.remove();
+                            entity.remove(Entity.RemovalReason.DISCARDED);
 
                         }
 
@@ -109,15 +107,15 @@ public class AreaListener {
 
             if (spawnArea.getRockSmashSpawnerSettings().doesClearSpawns()) {
 
-                Map<UUID, List<PixelmonEntity>> spawns = RockSmashSpawner.pokemonSpawnedMap.get(a.getKey());
-                if (spawns.containsKey(player.getUniqueID())) {
+                Map<UUID, List<PokemonEntity>> spawns = RockSmashSpawner.pokemonSpawnedMap.get(a.getKey());
+                if (spawns.containsKey(player.getUuid())) {
 
-                    List<PixelmonEntity> pokemon = spawns.get(player.getUniqueID());
-                    for (PixelmonEntity entity : pokemon) {
+                    List<PokemonEntity> pokemon = spawns.get(player.getUuid());
+                    for (PokemonEntity entity : pokemon) {
 
-                        if (entity.battleController == null) {
+                        if (!entity.isBattling()) {
 
-                            entity.remove();
+                            entity.remove(Entity.RemovalReason.DISCARDED);
 
                         }
 
@@ -132,6 +130,7 @@ public class AreaListener {
             return false;
 
         });
+        return true;
 
     }
 

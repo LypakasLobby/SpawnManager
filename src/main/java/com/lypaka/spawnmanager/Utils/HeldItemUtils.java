@@ -1,14 +1,14 @@
 package com.lypaka.spawnmanager.Utils;
 
-import com.google.common.reflect.TypeToken;
-import com.lypaka.lypakautils.MiscHandlers.ItemStackBuilder;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.lypaka.lypakautils.Handlers.ItemStackHandler;
+import com.lypaka.lypakautils.Handlers.RandomHandler;
+import com.lypaka.shadow.configurate.objectmapping.ObjectMappingException;
+import com.lypaka.shadow.google.common.reflect.TypeToken;
 import com.lypaka.spawnmanager.SpawnManager;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.CompoundEyes;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.SuperLuck;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
 import net.minecraft.item.ItemStack;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.util.*;
 
@@ -18,14 +18,14 @@ public class HeldItemUtils {
 
     public static void load() throws ObjectMappingException {
 
-        heldItemMap = SpawnManager.configManager.getConfigNode(1, "Items").getValue(new TypeToken<Map<String, Map<String, List<String>>>>() {});
+        heldItemMap = SpawnManager.configManager.getConfigNode(0, "Items").getValue(new TypeToken<Map<String, Map<String, List<String>>>>() {});
 
     }
 
     public static void tryApplyHeldItem (Pokemon wildPokemon, Pokemon playersPokemon) {
 
-        String name = wildPokemon.getLocalizedName().toLowerCase();
-        String form = wildPokemon.getForm().getLocalizedName();
+        String name = wildPokemon.getSpecies().getName().toLowerCase();
+        String form = wildPokemon.getForm().getName();
 
         String pokemon;
         if (form.equalsIgnoreCase("default")) {
@@ -94,13 +94,13 @@ public class HeldItemUtils {
 
             }
 
-            if (RandomHelper.getRandomChance(percent)) {
+            if (RandomHandler.getRandomChance(percent)) {
 
                 List<String> ids = possibleItems.get(percent + "%");
-                String id = RandomHelper.getRandomElementFromList(ids);
-                heldItem = ItemStackBuilder.buildFromStringID(id);
+                String id = RandomHandler.getRandomElementFromList(ids);
+                heldItem = ItemStackHandler.buildFromStringID(id);
                 heldItem.setCount(1);
-                wildPokemon.setHeldItem(heldItem);
+                wildPokemon.setHeldItem$common(heldItem);
                 break;
 
             }

@@ -4,24 +4,27 @@ import ca.landonjw.gooeylibs2.api.UIManager;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
-import com.google.common.reflect.TypeToken;
+import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.lypaka.areamanager.Areas.Area;
-import com.lypaka.lypakautils.FancyText;
-import com.lypaka.lypakautils.MiscHandlers.ItemStackBuilder;
+import com.lypaka.lypakautils.Handlers.FancyTextHandler;
+import com.lypaka.lypakautils.Handlers.ItemStackHandler;
+import com.lypaka.lypakautils.Handlers.WorldTimeHandler;
+import com.lypaka.shadow.configurate.objectmapping.ObjectMappingException;
+import com.lypaka.shadow.google.common.reflect.TypeToken;
 import com.lypaka.spawnmanager.ConfigGetters;
 import com.lypaka.spawnmanager.GUIs.SpawnLists.PossibleSpawnsList;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnManager;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.world.WorldTime;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.util.*;
 
@@ -41,12 +44,12 @@ public class PossibleSpawnsMenu {
 
     public void build() {
 
-        World world = this.player.world;
+        World world = this.player.getWorld();
         String time = "Night";
-        List<WorldTime> times = WorldTime.getCurrent(world);
-        for (WorldTime t : times) {
+        List<String> times = WorldTimeHandler.getCurrentTimeValues(world);
+        for (String t : times) {
 
-            if (t.name().contains("day") || t.name().contains("dawn") || t.name().contains("morning") || t.name().contains("afternoon")) {
+            if (t.equalsIgnoreCase("day") || t.equalsIgnoreCase("dawn") || t.equalsIgnoreCase("morning")) {
 
                 time = "Day";
                 break;
@@ -70,38 +73,40 @@ public class PossibleSpawnsMenu {
         Map<Integer, UUID> m3 = new HashMap<>();
         for (Area a : this.areas) {
 
-            String blockID = world.getBlockState(this.player.getPosition()).getBlock().getRegistryName().toString();
+            BlockPos pos = player.getBlockPos();
+            BlockState state = world.getBlockState(pos);
+            String blockID = Registries.BLOCK.getId(state.getBlock()).toString();
             if (blockID.equalsIgnoreCase("air")) location = "air";
             if (blockID.contains("water") || blockID.contains("lava")) location = "water";
-            if (this.player.getPosition().getY() <= a.getUnderground()) location = "underground";
+            if (this.player.getY() <= a.getUnderground()) location = "underground";
             AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(SpawnAreaHandler.areaMap.get(a));
 
-            if (spawns.getNaturalSpawns().size() > 0) {
+            if (!spawns.getNaturalSpawns().isEmpty()) {
 
                 PossibleSpawnsList.buildNatural(time, weather, location, spawns, m1, m2, m3);
 
             }
-            if (spawns.getFishSpawns().size() > 0) {
+            if (!spawns.getFishSpawns().isEmpty()) {
 
                 PossibleSpawnsList.buildFish(time, weather, spawns, m1, m2, m3);
 
             }
-            if (spawns.getHeadbuttSpawns().size() > 0) {
+            if (!spawns.getHeadbuttSpawns().isEmpty()) {
 
                 PossibleSpawnsList.buildHeadbutt(time, weather, spawns, m1, m2, m3);
 
             }
-            if (spawns.getRockSmashSpawns().size() > 0) {
+            if (!spawns.getRockSmashSpawns().isEmpty()) {
 
                 PossibleSpawnsList.buildRockSmash(time, weather, spawns, m1, m2, m3);
 
             }
-            if (spawns.getGrassSpawns().size() > 0) {
+            if (!spawns.getGrassSpawns().isEmpty()) {
 
                 PossibleSpawnsList.buildGrass(time, weather, location, spawns, m1, m2, m3);
 
             }
-            if (spawns.getSurfSpawns().size() > 0) {
+            if (!spawns.getSurfSpawns().isEmpty()) {
 
                 PossibleSpawnsList.buildSurf(time, weather, spawns, m1, m2, m3);
 
@@ -128,7 +133,7 @@ public class PossibleSpawnsMenu {
         ChestTemplate template = ChestTemplate.builder(rows).build();
         GooeyPage page = GooeyPage.builder()
                 .template(template)
-                .title(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle))
+                .title(FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle))
                 .build();
 
         int max = 9 * rows;
@@ -150,23 +155,23 @@ public class PossibleSpawnsMenu {
                 int slot = Integer.parseInt(entry.getKey().replace("Slot-", ""));
                 Map<String, String> data = entry.getValue();
                 String displayID = data.get("ID");
-                ItemStack displayStack = ItemStackBuilder.buildFromStringID(displayID);
+                ItemStack displayStack = ItemStackHandler.buildFromStringID(displayID);
                 if (data.containsKey("Display-Name")) {
 
-                    displayStack.setDisplayName(FancyText.getFormattedText(data.get("Display-Name")));
+                    displayStack.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(data.get("Display-Name")));
 
                 }
                 if (data.containsKey("Lore")) {
 
-                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
-                    ListNBT lore = new ListNBT();
+                    List<String> displayLore = SpawnManager.configManager.getConfigNode(1, "Spawns-Possible", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
+                    List<Text> lore = new ArrayList<>();
                     for (String l : displayLore) {
 
-                        lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l))));
+                        lore.add(FancyTextHandler.getFormattedText(l));
 
                     }
 
-                    displayStack.getOrCreateChildTag("display").put("Lore", lore);
+                    displayStack.set(DataComponentTypes.LORE, new LoreComponent(lore));
 
                 }
 
@@ -217,10 +222,10 @@ public class PossibleSpawnsMenu {
 
         if (this.spawnsMap.size() >= usable) {
 
-            Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
+            Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(1, "Spawns-Possible", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
             String nextPageID = utilityMap.get("Next-Page").get("ID");
-            ItemStack next = ItemStackBuilder.buildFromStringID(nextPageID);
-            next.setDisplayName(FancyText.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
+            ItemStack next = ItemStackHandler.buildFromStringID(nextPageID);
+            next.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
             int slot = Integer.parseInt(utilityMap.get("Next-Page").get("Slot"));
             GooeyButton button = GooeyButton.builder()
                     .display(next)
@@ -262,7 +267,7 @@ public class PossibleSpawnsMenu {
         ChestTemplate template = ChestTemplate.builder(rows).build();
         GooeyPage page = GooeyPage.builder()
                 .template(template)
-                .title(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle))
+                .title(FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle))
                 .build();
 
         int startingIndex = ((rows * 9) - 10) + (pageNum - 1);
@@ -285,23 +290,23 @@ public class PossibleSpawnsMenu {
                 int slot = Integer.parseInt(entry.getKey().replace("Slot-", ""));
                 Map<String, String> data = entry.getValue();
                 String displayID = data.get("ID");
-                ItemStack displayStack = ItemStackBuilder.buildFromStringID(displayID);
+                ItemStack displayStack = ItemStackHandler.buildFromStringID(displayID);
                 if (data.containsKey("Display-Name")) {
 
-                    displayStack.setDisplayName(FancyText.getFormattedText(data.get("Display-Name")));
+                    displayStack.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(data.get("Display-Name")));
 
                 }
                 if (data.containsKey("Lore")) {
 
-                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
-                    ListNBT lore = new ListNBT();
+                    List<String> displayLore = SpawnManager.configManager.getConfigNode(1, "Spawns-Possible", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
+                    List<Text> lore = new ArrayList<>();
                     for (String l : displayLore) {
 
-                        lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l))));
+                        lore.add(FancyTextHandler.getFormattedText(l));
 
                     }
 
-                    displayStack.getOrCreateChildTag("display").put("Lore", lore);
+                    displayStack.set(DataComponentTypes.LORE, new LoreComponent(lore));
 
                 }
 
@@ -355,12 +360,12 @@ public class PossibleSpawnsMenu {
 
         }
 
-        Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
+        Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(1, "Spawns-Possible", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
         if (currentIndex >= maxIndex) {
 
             String nextPageID = utilityMap.get("Next-Page").get("ID");
-            ItemStack next = ItemStackBuilder.buildFromStringID(nextPageID);
-            next.setDisplayName(FancyText.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
+            ItemStack next = ItemStackHandler.buildFromStringID(nextPageID);
+            next.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
             int slot = Integer.parseInt(utilityMap.get("Next-Page").get("Slot"));
             GooeyButton button = GooeyButton.builder()
                     .display(next)
@@ -384,8 +389,8 @@ public class PossibleSpawnsMenu {
         }
 
         String previousPageID = utilityMap.get("Prev-Page").get("ID");
-        ItemStack prev = ItemStackBuilder.buildFromStringID(previousPageID);
-        prev.setDisplayName(FancyText.getFormattedText(utilityMap.get("Prev-Page").get("Display-Name")));
+        ItemStack prev = ItemStackHandler.buildFromStringID(previousPageID);
+        prev.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(utilityMap.get("Prev-Page").get("Display-Name")));
         int slot = Integer.parseInt(utilityMap.get("Prev-Page").get("Slot"));
         GooeyButton button = GooeyButton.builder()
                         .display(prev)

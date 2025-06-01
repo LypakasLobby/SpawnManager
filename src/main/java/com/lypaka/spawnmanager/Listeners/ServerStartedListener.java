@@ -1,56 +1,32 @@
 package com.lypaka.spawnmanager.Listeners;
 
-import com.lypaka.spawnmanager.ConfigGetters;
-import com.lypaka.spawnmanager.SpawnManager;
-import com.lypaka.spawnmanager.Spawners.*;
-import com.pixelmonmod.pixelmon.Pixelmon;
-import com.pixelmonmod.pixelmon.spawning.PixelmonSpawning;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import com.lypaka.areamanager.API.AreaEvents.AreaLeaveCallback;
+import com.lypaka.areamanager.API.FinishedLoadingCallback;
+import com.lypaka.lypakautils.API.PlayerLandMovementCallback;
+import com.lypaka.lypakautils.API.PlayerWaterMovementCallback;
+import com.lypaka.spawnmanager.Spawners.GrassSpawner;
+import com.lypaka.spawnmanager.Spawners.NaturalSpawner;
+import com.lypaka.spawnmanager.Spawners.SurfSpawner;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.MinecraftServer;
 
-import java.util.Timer;
-import java.util.TimerTask;
+public class ServerStartedListener implements ServerLifecycleEvents.ServerStarted {
 
-@Mod.EventBusSubscriber(modid = SpawnManager.MOD_ID)
-public class ServerStartedListener {
+    @Override
+    public void onServerStarted (MinecraftServer minecraftServer) {
 
-    public static boolean defaultSpawnerActive = true;
-
-    @SubscribeEvent
-    public static void onServerStarted (FMLServerStartedEvent event) {
-
-        MinecraftForge.EVENT_BUS.register(new AreaListener());
-        MinecraftForge.EVENT_BUS.register(new GrassSpawner());
-        MinecraftForge.EVENT_BUS.register(new SurfSpawner());
-        MinecraftForge.EVENT_BUS.register(new TickListener());
-        MinecraftForge.EVENT_BUS.register(new DisconnectListener());
-
-        Pixelmon.EVENT_BUS.register(new BattleEndListener());
-        Pixelmon.EVENT_BUS.register(new FishSpawner());
-        Pixelmon.EVENT_BUS.register(new HeadbuttSpawner());
-        Pixelmon.EVENT_BUS.register(new NaturalPixelmonSpawnListener());
-        Pixelmon.EVENT_BUS.register(new RockSmashSpawner());
-
+        AreaLeaveCallback.EVENT.register(new AreaListener());
+        BattleEndListener.registerAll();
+        ServerPlayConnectionEvents.DISCONNECT.register(new DisconnectListener());
+        FinishedLoadingCallback.EVENT.register(new LoadListener());
+        FinishedLoadingCallback.EVENT.invoker().onFinishedLoading();
+        NaturalCobblemonSpawnListener.register();
+        ServerTickEvents.END_SERVER_TICK.register(new TickListener());
+        PlayerLandMovementCallback.EVENT.register(new GrassSpawner());
+        PlayerWaterMovementCallback.EVENT.register(new SurfSpawner());
         NaturalSpawner.startTimer();
-
-        if (ConfigGetters.disablePixelmonsSpawner) {
-
-            defaultSpawnerActive = false;
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-
-                @Override
-                public void run() {
-
-                    PixelmonSpawning.coordinator.deactivate();
-
-                }
-
-            }, 3000);
-
-        }
 
     }
 

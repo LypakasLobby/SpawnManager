@@ -1,32 +1,31 @@
 package com.lypaka.spawnmanager.SpawnAreas.Spawns;
 
-import com.pixelmonmod.pixelmon.api.pokemon.Element;
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.pokemon.PokemonBuilder;
+
+import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
+import com.cobblemon.mod.common.api.types.ElementalType;
+import com.cobblemon.mod.common.pokemon.FormData;
+import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.cobblemon.mod.common.pokemon.Species;
+import com.lypaka.lypakautils.Handlers.RandomHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PokemonSpawn {
 
-    private final String species;
+    private final String speciesName;
     private final String form;
     private final int minLevel;
     private final int maxLevel;
-    private double hostileChance;
-    private double totemChance;
-    private double titanChance;
-    private final List<Element> types;
+    private final List<ElementalType> types;
+    private Species species;
 
-    public PokemonSpawn (String species, String form, int minLevel, int maxLevel, double hostileChance, double totemChance, double titanChance) {
+    public PokemonSpawn (String speciesName, String form, int minLevel, int maxLevel) {
 
-        this.species = species;
+        this.speciesName = speciesName;
         this.form = form;
         this.minLevel = minLevel;
         this.maxLevel = maxLevel;
-        this.hostileChance = 0;
-        this.totemChance = 0;
-        this.titanChance = 0;
         this.types = new ArrayList<>();
         init();
 
@@ -35,59 +34,33 @@ public abstract class PokemonSpawn {
     // Used to get the types and store them to use with the external Abilities (like checking Flash Fire and shit) later on
     public void init() {
 
-        Pokemon pokemon = PokemonBuilder.builder().species(this.species).build();
+        this.species = PokemonSpecies.INSTANCE.getByName(this.speciesName.toLowerCase());
         if (!this.form.equalsIgnoreCase("default")) {
 
-            pokemon.setForm(this.form);
+            FormData data = this.species.getFormByName(this.form);
+            data.getTypes().forEach(this.types::add);
+
+        } else {
+
+            this.species.getTypes().forEach(this.types::add);
 
         }
-        this.types.addAll(pokemon.getForm().getTypes());
 
     }
 
-    public double getHostileChance() {
-
-        return this.hostileChance;
-
-    }
-
-    public void setHostileChance (double chance) {
-
-        this.hostileChance = chance;
-
-    }
-
-    public double getTotemChance() {
-
-        return this.totemChance;
-
-    }
-
-    public void setTotemChance (double chance) {
-
-        this.totemChance = chance;
-
-    }
-
-    public double getTitanChance() {
-
-        return this.titanChance;
-
-    }
-
-    public void setTitanChance (double chance) {
-
-        this.titanChance = chance;
-
-    }
-
-    public List<Element> getTypes() {
+    public List<ElementalType> getTypes() {
 
         return this.types;
 
     }
 
-    public String getSpecies() {
+    public String getSpeciesName() {
+
+        return this.speciesName;
+
+    }
+
+    public Species getSpecies() {
 
         return this.species;
 
@@ -108,6 +81,12 @@ public abstract class PokemonSpawn {
     public int getMaxLevel() {
 
         return this.maxLevel;
+
+    }
+
+    public Pokemon buildAndGetPokemon() {
+
+        return this.species.create(RandomHandler.getRandomNumberBetween(this.minLevel, this.maxLevel));
 
     }
 

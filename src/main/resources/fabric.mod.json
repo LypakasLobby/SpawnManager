@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "spawnmanager",
+  "version": "${version}",
+  "name": "SpawnManager",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/spawnmanager/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.lypaka.spawnmanager.SpawnManager"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "areamanager": "1.21.1-1.2.0"
+  }
+}

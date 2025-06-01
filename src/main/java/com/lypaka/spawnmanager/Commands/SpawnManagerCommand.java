@@ -1,26 +1,22 @@
 package com.lypaka.spawnmanager.Commands;
 
-import com.lypaka.spawnmanager.SpawnManager;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.server.command.ConfigCommand;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = SpawnManager.MOD_ID)
 public class SpawnManagerCommand {
 
     public static List<String> ALIASES = Arrays.asList("spawnmanager", "spawns", "sman");
 
-    @SubscribeEvent
-    public static void onCommandRegistration (RegisterCommandsEvent event) {
+    public static void register() {
 
-        new MenuCommand(event.getDispatcher());
-        new ReloadCommand(event.getDispatcher());
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 
-        ConfigCommand.register(event.getDispatcher());
+            new MenuCommand(dispatcher);
+            new ReloadCommand(dispatcher);
+
+        });
 
     }
 

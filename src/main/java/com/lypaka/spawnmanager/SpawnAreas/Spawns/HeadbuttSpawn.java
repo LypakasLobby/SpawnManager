@@ -8,7 +8,7 @@ public class HeadbuttSpawn extends PokemonSpawn {
 
     public HeadbuttSpawn (String species, String form, int minLevel, int maxLevel, Map<String, Map<String, Map<String, String>>> spawnData) {
 
-        super(species, form, minLevel, maxLevel, 0, 0, 0);
+        super(species, form, minLevel, maxLevel);
         this.spawnData = spawnData;
 
     }
