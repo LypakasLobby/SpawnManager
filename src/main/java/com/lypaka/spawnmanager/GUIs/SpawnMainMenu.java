@@ -82,29 +82,13 @@ public class SpawnMainMenu {
 
                                     PossibleSpawnsMenu possibleSpawns = new PossibleSpawnsMenu(player, areas);
                                     possibleSpawns.build();
-                                    try {
-
-                                        possibleSpawns.open();
-
-                                    } catch (ObjectMappingException e) {
-
-                                        e.printStackTrace();
-
-                                    }
+                                    possibleSpawns.open();
 
                                 } else if (menuToOpen.equalsIgnoreCase("Spawns-All")) {
 
                                     AllSpawnsMenu allSpawns = new AllSpawnsMenu(player, areas);
                                     allSpawns.build();
-                                    try {
-
-                                        allSpawns.open();
-
-                                    } catch (ObjectMappingException e) {
-
-                                        e.printStackTrace();
-
-                                    }
+                                    allSpawns.open();
 
                                 }
 

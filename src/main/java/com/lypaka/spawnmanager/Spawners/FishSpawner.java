@@ -28,7 +28,6 @@ public class FishSpawner {
     public static List<UUID> spawnedPokemonUUIDs = new ArrayList<>();
     public static Map<Area, Map<UUID, List<PokemonEntity>>> pokemonSpawnedMap = new HashMap<>();
     public static Map<UUID, Pokemon> fishSpawnerMap = new HashMap<>();
-    public static Map<UUID, Pokemon> jankySpawnMap = new HashMap<>();
 
     public static void registerCast() {
 
@@ -94,9 +93,9 @@ public class FishSpawner {
 
     public static void registerReel() {
 
-        CobblemonEvents.BOBBER_SPAWN_POKEMON_POST.subscribe(Priority.NORMAL, event -> {
+        CobblemonEvents.BOBBER_SPAWN_POKEMON_MODIFY.subscribe(Priority.NORMAL, event -> {
 
-            ServerPlayerEntity player = (ServerPlayerEntity) event.getBobber().getPlayerOwner();
+            ServerPlayerEntity player = (ServerPlayerEntity) event.getRod().getHolder();
             int x = player.getBlockPos().getX();
             int y = player.getBlockPos().getY();
             int z = player.getBlockPos().getZ();
@@ -209,12 +208,7 @@ public class FishSpawner {
 
                             }
                             poke.setLevel(level);
-
                             HeldItemUtils.tryApplyHeldItem(poke, playersPokemon);
-
-                            //PokemonEntity fishedUpPokemon = new PokemonEntity(player.getWorld(), poke, CobblemonEntities.POKEMON);
-                            //fishedUpPokemon.setPosition(event.getPokemon().getBlockX(), event.getPokemon().getBlockY(), event.getPokemon().getBlockZ());
-                            //player.getWorld().spawnEntity(fishedUpPokemon);
                             event.getPokemon().setPokemon(poke);
 
                         }

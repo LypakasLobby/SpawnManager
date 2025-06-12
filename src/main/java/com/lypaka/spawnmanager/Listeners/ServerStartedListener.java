@@ -4,6 +4,7 @@ import com.lypaka.areamanager.API.AreaEvents.AreaLeaveCallback;
 import com.lypaka.areamanager.API.FinishedLoadingCallback;
 import com.lypaka.lypakautils.API.PlayerLandMovementCallback;
 import com.lypaka.lypakautils.API.PlayerWaterMovementCallback;
+import com.lypaka.spawnmanager.Spawners.FishSpawner;
 import com.lypaka.spawnmanager.Spawners.GrassSpawner;
 import com.lypaka.spawnmanager.Spawners.NaturalSpawner;
 import com.lypaka.spawnmanager.Spawners.SurfSpawner;
@@ -27,6 +28,7 @@ public class ServerStartedListener implements ServerLifecycleEvents.ServerStarte
         PlayerLandMovementCallback.EVENT.register(new GrassSpawner());
         PlayerWaterMovementCallback.EVENT.register(new SurfSpawner());
         NaturalSpawner.startTimer();
+        FishSpawner.registerReel();
 
     }
 
