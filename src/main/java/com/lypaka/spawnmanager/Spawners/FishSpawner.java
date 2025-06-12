@@ -19,6 +19,11 @@ import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
 import com.pixelmonmod.pixelmon.api.world.WorldTime;
+import com.pixelmonmod.pixelmon.battles.BattleRegistry;
+import com.pixelmonmod.pixelmon.battles.api.rules.BattleRules;
+import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
+import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
+import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
 import com.pixelmonmod.pixelmon.entities.pixelmon.PixelmonEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.World;
@@ -33,6 +38,7 @@ public class FishSpawner {
     public static List<UUID> spawnedPokemonUUIDs = new ArrayList<>();
     public static Map<Area, Map<UUID, List<PixelmonEntity>>> pokemonSpawnedMap = new HashMap<>();
     public static Map<UUID, Pokemon> fishSpawnerMap = new HashMap<>();
+    public static Map<UUID, Pokemon> jankySpawnMap = new HashMap<>();
 
     @SubscribeEvent
     public void onCast (FishingEvent.Cast event) {
@@ -74,6 +80,7 @@ public class FishSpawner {
             PixelmonEntity pixelmon = (PixelmonEntity) event.plannedSpawn.getOrCreateEntity();
             UUID uuid = pixelmon.getUniqueID();
             fishSpawnerMap.put(uuid, pixelmon.getPokemon());
+            jankySpawnMap.put(event.player.getUniqueID(), pixelmon.getPokemon());
 
         }
 
@@ -82,198 +89,161 @@ public class FishSpawner {
     @SubscribeEvent
     public void onFish (FishingEvent.Reel event) {
 
-        if (event.isPokemon()) {
+        String rod = event.getRodType().name().replace("Rod", "");
+        ServerPlayerEntity player = event.player;
+        int x = player.getPosition().getX();
+        int y = player.getPosition().getY();
+        int z = player.getPosition().getZ();
+        World world = player.world;
+        List<Area> areas = AreaHandler.getSortedAreas(x, y, z, world);
+        if (areas.size() == 0) return;
+        jankySpawnMap.entrySet().removeIf(entry -> {
 
-            ServerPlayerEntity player = event.player;
-            int x = player.getPosition().getX();
-            int y = player.getPosition().getY();
-            int z = player.getPosition().getZ();
-            World world = player.world;
-            List<Area> areas = AreaHandler.getSortedAreas(x, y, z, world);
-            if (areas.size() == 0) return;
-            String rod = event.getRodType().name().replace("Rod", "");
-            String time = "Night";
-            List<WorldTime> times = WorldTime.getCurrent(world);
-            for (WorldTime t : times) {
+            if (entry.getKey().toString().equalsIgnoreCase(player.getUniqueID().toString())) {
 
-                if (t.name().contains("DAY") || t.name().contains("DAWN") || t.name().contains("MORNING") || t.name().contains("AFTERNOON")) {
+                String time = "Night";
+                List<WorldTime> times = WorldTime.getCurrent(world);
+                for (WorldTime t : times) {
 
-                    time = "Day";
-                    break;
+                    if (t.name().contains("DAY") || t.name().contains("DAWN") || t.name().contains("MORNING") || t.name().contains("AFTERNOON")) {
+
+                        time = "Day";
+                        break;
+
+                    }
+
+                }
+                String weather = "Clear";
+                if (world.isRaining()) {
+
+                    weather = "Rain";
+
+                } else if (world.isThundering()) {
+
+                    weather = "Storm";
 
                 }
 
-            }
-            String weather = "Clear";
-            if (world.isRaining()) {
+                Pokemon playersPokemon = null;
+                PlayerPartyStorage party = StorageProxy.getParty(player);
+                for (int i = 0; i < 6; i++) {
 
-                weather = "Rain";
+                    Pokemon p = party.get(i);
+                    if (p != null) {
 
-            } else if (world.isThundering()) {
+                        playersPokemon = p;
+                        break;
 
-                weather = "Storm";
-
-            }
-
-            Pokemon playersPokemon = null;
-            PlayerPartyStorage party = StorageProxy.getParty(player);
-            for (int i = 0; i < 6; i++) {
-
-                Pokemon p = party.get(i);
-                if (p != null) {
-
-                    playersPokemon = p;
-                    break;
+                    }
 
                 }
+                double modifier = 1.0;
+                if (ArenaTrap.applies(playersPokemon) || Illuminate.applies(playersPokemon) || NoGuard.applies(playersPokemon)) {
 
-            }
-            double modifier = 1.0;
-            if (ArenaTrap.applies(playersPokemon) || Illuminate.applies(playersPokemon) || NoGuard.applies(playersPokemon)) {
+                    modifier = 2.0;
 
-                modifier = 2.0;
+                } else if (Infiltrator.applies(playersPokemon) || QuickFeet.applies(playersPokemon) || Stench.applies(playersPokemon) || WhiteSmoke.applies(playersPokemon)) {
 
-            } else if (Infiltrator.applies(playersPokemon) || QuickFeet.applies(playersPokemon) || Stench.applies(playersPokemon) || WhiteSmoke.applies(playersPokemon)) {
+                    modifier = 0.5;
 
-                modifier = 0.5;
+                }
+                for (int i = 0; i < areas.size(); i++) {
 
-            }
-            for (int i = 0; i < areas.size(); i++) {
+                    Area currentArea = areas.get(i);
+                    SpawnArea spawnArea = SpawnAreaHandler.areaMap.get(currentArea);
+                    AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
+                    if (spawns.getFishSpawns().size() > 0) {
 
-                Area currentArea = areas.get(i);
-                SpawnArea spawnArea = SpawnAreaHandler.areaMap.get(currentArea);
-                AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
-                if (spawns.getFishSpawns().size() > 0) {
+                        Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildFishSpawns(rod, time, weather, spawns, modifier);
+                        Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
+                        for (Map.Entry<PokemonSpawn, Double> p : pokemon.entrySet()) {
 
-                    Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildFishSpawns(rod, time, weather, spawns, modifier);
-                    Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
-                    for (Map.Entry<PokemonSpawn, Double> p : pokemon.entrySet()) {
+                            if (RandomHelper.getRandomChance(p.getValue())) {
 
-                        if (RandomHelper.getRandomChance(p.getValue())) {
+                                Pokemon poke = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(p.getKey());
+                                mapForHustle.put(poke, p.getKey());
+                                if (Intimidate.applies(playersPokemon) || KeenEye.applies(playersPokemon)) {
 
-                            Pokemon poke = PokemonSpawnBuilder.buildPokemonFromPokemonSpawn(p.getKey());
-                            mapForHustle.put(poke, p.getKey());
-                            if (Intimidate.applies(playersPokemon) || KeenEye.applies(playersPokemon)) {
+                                    poke = Intimidate.tryIntimidate(poke, playersPokemon);
+                                    if (poke == null) continue;
 
-                                poke = Intimidate.tryIntimidate(poke, playersPokemon);
-                                if (poke == null) continue;
+                                }
+                                if (FlashFire.applies(playersPokemon)) {
 
-                            }
-                            if (FlashFire.applies(playersPokemon)) {
+                                    poke = FlashFire.tryFlashFire(poke, pokemon);
 
-                                poke = FlashFire.tryFlashFire(poke, pokemon);
+                                } else if (Harvest.applies(playersPokemon)) {
 
-                            } else if (Harvest.applies(playersPokemon)) {
+                                    poke = Harvest.tryHarvest(poke, pokemon);
 
-                                poke = Harvest.tryHarvest(poke, pokemon);
+                                } else if (LightningRod.applies(playersPokemon) || Static.applies(playersPokemon)) {
 
-                            } else if (LightningRod.applies(playersPokemon) || Static.applies(playersPokemon)) {
+                                    poke = LightningRod.tryLightningRod(poke, pokemon);
 
-                                poke = LightningRod.tryLightningRod(poke, pokemon);
+                                } else if (MagnetPull.applies(playersPokemon)) {
 
-                            } else if (MagnetPull.applies(playersPokemon)) {
+                                    poke = MagnetPull.tryMagnetPull(poke, pokemon);
 
-                                poke = MagnetPull.tryMagnetPull(poke, pokemon);
+                                } else if (StormDrain.applies(playersPokemon)) {
 
-                            } else if (StormDrain.applies(playersPokemon)) {
+                                    poke = StormDrain.tryStormDrain(poke, pokemon);
 
-                                poke = StormDrain.tryStormDrain(poke, pokemon);
+                                }
 
-                            }
+                                if (CuteCharm.applies(playersPokemon)) {
 
-                            if (CuteCharm.applies(playersPokemon)) {
+                                    CuteCharm.tryApplyCuteCharmEffect(poke, playersPokemon);
 
-                                CuteCharm.tryApplyCuteCharmEffect(poke, playersPokemon);
+                                } else if (Synchronize.applies(playersPokemon)) {
 
-                            } else if (Synchronize.applies(playersPokemon)) {
+                                    Synchronize.applySynchronize(poke, playersPokemon);
 
-                                Synchronize.applySynchronize(poke, playersPokemon);
+                                }
 
-                            }
+                                int level = poke.getPokemonLevel();
+                                if (Hustle.applies(playersPokemon) || Pressure.applies(playersPokemon) || VitalSpirit.applies(playersPokemon)) {
 
-                            int level = poke.getPokemonLevel();
-                            if (Hustle.applies(playersPokemon) || Pressure.applies(playersPokemon) || VitalSpirit.applies(playersPokemon)) {
+                                    level = Hustle.tryHustle(level, mapForHustle.get(poke));
 
-                                level = Hustle.tryHustle(level, mapForHustle.get(poke));
+                                }
+                                poke.setLevel(level);
+                                poke.setLevelNum(level);
 
-                            }
-                            poke.setLevel(level);
-                            poke.setLevelNum(level);
+                                HeldItemUtils.tryApplyHeldItem(poke, playersPokemon);
 
-                            HeldItemUtils.tryApplyHeldItem(poke, playersPokemon);
+                                AreaFishSpawnEvent spawnEvent = new AreaFishSpawnEvent(player, currentArea, rod, poke);
+                                MinecraftForge.EVENT_BUS.post(spawnEvent);
+                                if (!spawnEvent.isCanceled()) {
 
-                            AreaFishSpawnEvent spawnEvent = new AreaFishSpawnEvent(player, currentArea, rod, poke);
-                            MinecraftForge.EVENT_BUS.post(spawnEvent);
-                            if (!spawnEvent.isCanceled()) {
+                                    if (spawnEvent.getPokemon() != null) {
 
-                                if (spawnEvent.getPokemon() != null) {
+                                        PixelmonEntity fishedUpPokemon;// = (PixelmonEntity) event.optEntity.orElse(new PixelmonEntity(player.world, spawnEvent.getPokemon()));
+                                        try {
 
-                                    PixelmonEntity fishedUpPokemon = (PixelmonEntity) event.optEntity.get();
-                                    fishedUpPokemon.getPokemon().setSpecies(spawnEvent.getPokemon().getSpecies(), false);
-                                    fishedUpPokemon.getPokemon().setForm(spawnEvent.getPokemon().getForm());
-                                    fishedUpPokemon.getPokemon().setLevel(spawnEvent.getPokemon().getPokemonLevel());
-                                    if (ModList.get().isLoaded("hostilepokemon")) {
+                                            fishedUpPokemon = (PixelmonEntity) event.optEntity.orElse(new PixelmonEntity(player.world, spawnEvent.getPokemon()));
 
-                                        HostileManager.tryHostile(mapForHustle.get(poke), fishedUpPokemon, player);
+                                        } catch (ClassCastException e) {
 
-                                    }
-                                    if (!fishedUpPokemon.getPersistentData().contains("IsHostile")) {
-
-                                        if (ModList.get().isLoaded("totempokemon")) {
-
-                                            TotemManager.tryTotem(mapForHustle.get(poke), fishedUpPokemon, player);
-
-                                        } else {
-
-                                            if (ModList.get().isLoaded("titanpokemon")) {
-
-                                                TitanManager.tryTitan(mapForHustle.get(poke), fishedUpPokemon, player);
-
-                                            }
+                                            event.setCanceled(true); // should despawn the item that spawned
+                                            fishedUpPokemon = new PixelmonEntity(player.world, spawnEvent.getPokemon());
 
                                         }
 
-                                    }
-                                    if (spawnArea.getFishSpawnerSettings().doesDespawnAfterBattle()) {
-
-                                        spawnedPokemonUUIDs.add(fishedUpPokemon.getUniqueID());
+                                        fishedUpPokemon.setPosition(event.fishHook.getPosX(), event.fishHook.getPosY(), event.fishHook.getPosZ());
+                                        fishedUpPokemon.setSpawnLocation(fishedUpPokemon.getDefaultSpawnLocation());
+                                        player.world.addEntity(fishedUpPokemon);
+                                        WildPixelmonParticipant wpp = new WildPixelmonParticipant(fishedUpPokemon);
+                                        PlayerParticipant pp = new PlayerParticipant(player, StorageProxy.getParty(player).getTeam(), 1);
+                                        BattleRegistry.startBattle(new BattleParticipant[]{wpp}, new BattleParticipant[]{pp}, new BattleRules());
 
                                     } else {
 
-                                        if (spawnArea.getFishSpawnerSettings().getDespawnTimer() > 0) {
-
-                                            fishedUpPokemon.despawnCounter = spawnArea.getFishSpawnerSettings().getDespawnTimer();
-
-                                        }
+                                        event.setCanceled(true);
 
                                     }
-                                    if (spawnArea.getFishSpawnerSettings().doesClearSpawns()) {
-
-                                        Map<UUID, List<PixelmonEntity>> spawnedMap = new HashMap<>();
-                                        if (pokemonSpawnedMap.containsKey(currentArea)) {
-
-                                            spawnedMap = pokemonSpawnedMap.get(currentArea);
-
-                                        }
-                                        List<PixelmonEntity> spawnedPokemon = new ArrayList<>();
-                                        if (spawnedMap.containsKey(player.getUniqueID())) {
-
-                                            spawnedPokemon = spawnedMap.get(player.getUniqueID());
-
-                                        }
-
-                                        spawnedPokemon.add(fishedUpPokemon);
-                                        spawnedMap.put(player.getUniqueID(), spawnedPokemon);
-                                        pokemonSpawnedMap.put(currentArea, spawnedMap);
-
-                                    }
-
-                                } else {
-
-                                    event.setCanceled(true);
+                                    break;
 
                                 }
-                                break;
 
                             }
 
@@ -283,9 +253,13 @@ public class FishSpawner {
 
                 }
 
+                return true;
+
             }
 
-        }
+            return false;
+
+        });
 
     }
 

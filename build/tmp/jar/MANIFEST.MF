@@ -2,6 +2,6 @@ Manifest-Version: 1.0
 Specification-Title: spawnmanager
 Specification-Version: 1
 Implementation-Title: SpawnManager
-Implementation-Version: 1.16.5-2.0.0
-Implementation-Timestamp: 2024-09-25T23:41:41-0500
+Implementation-Version: 1.16.5-2.0.5
+Implementation-Timestamp: 2025-06-11T22:20:25-0500
 

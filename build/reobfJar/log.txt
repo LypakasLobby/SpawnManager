@@ -1,14 +1,14 @@
-Java Launcher: C:\Users\ryan9\.gradle\jdks\temurin-8-amd64-windows\jdk8u372-b07\bin\java.exe
-Arguments: '--in-jar, C:\Users\ryan9\Documents\GitHub\SpawnManager\build\libs\SpawnManager-1.16.5-2.0.0.jar, --out-jar, C:\Users\ryan9\Documents\GitHub\SpawnManager\build\reobfJar\output.jar, --srg-in, C:\Users\ryan9\Documents\GitHub\SpawnManager\build\createMcpToSrg\output.tsrg, --live'
+Java Launcher: C:\Users\ryan9\.gradle\jdks\temurin-8-amd64-windows.2\bin\java.exe
+Arguments: '--in-jar, D:\GitHub\SpawnManager\build\libs\SpawnManager-1.16.5-2.0.5.jar, --out-jar, D:\GitHub\SpawnManager\build\reobfJar\output.jar, --srg-in, D:\GitHub\SpawnManager\build\createMcpToSrg\output.tsrg, --live'
 Classpath:
  - C:\Users\ryan9\.gradle\caches\forge_gradle\maven_downloader\net\md-5\SpecialSource\1.11.0\SpecialSource-1.11.0-shaded.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\LypakaUtils-1.16.5.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\Reforged.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\GooeyLibs-1.16.5.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\AreaManager-1.16.5-1.1.0.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\HostilePokemon-1.16.5-1.2.1.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\TotemPokemon-1.16.5-1.0.0.jar
- - C:\Users\ryan9\Documents\GitHub\LIBRARIES\TitanPokemon-1.16.5-1.1.0.jar
+ - D:\GitHub\LIBRARIES\LypakaUtils-1.16.5.jar
+ - D:\GitHub\LIBRARIES\Reforged.jar
+ - D:\GitHub\LIBRARIES\GooeyLibs-1.16.5.jar
+ - D:\GitHub\LIBRARIES\AreaManager-1.16.5-1.1.0.jar
+ - D:\GitHub\LIBRARIES\HostilePokemon-1.16.5-1.2.0.jar
+ - D:\GitHub\LIBRARIES\TotemPokemon-1.16.5-1.0.0.jar
+ - D:\GitHub\LIBRARIES\TitanPokemon-1.16.5-1.1.0.jar
  - C:\Users\ryan9\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.16.5-36.2.39_mapped_snapshot_20210309-1.16.5\forge-1.16.5-36.2.39_mapped_snapshot_20210309-1.16.5-recomp.jar
  - C:\Users\ryan9\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.16.5-36.2.39_mapped_snapshot_20210309-1.16.5\forge-1.16.5-36.2.39_mapped_snapshot_20210309-1.16.5-launcher.jar
  - C:\Users\ryan9\.gradle\caches\forge_gradle\minecraft_repo\versions\1.16.5\client-extra.jar
@@ -73,7 +73,7 @@ Classpath:
  - C:\Users\ryan9\.gradle\caches\modules-2\files-2.1\org.slf4j\slf4j-api\1.8.0-beta4\83b0359d847ee053d745be7ec0d8e9e8a44304b4\slf4j-api-1.8.0-beta4.jar
  - C:\Users\ryan9\.gradle\caches\modules-2\files-2.1\org.jline\jline-reader\3.12.1\4382ab1382c7b6f379377ed5f665dc2f6e1218bc\jline-reader-3.12.1.jar
  - C:\Users\ryan9\.gradle\caches\modules-2\files-2.1\org.jline\jline-terminal\3.12.1\c777448314e050d980a6b697c140f3bfe9eb7416\jline-terminal-3.12.1.jar
-Working directory: C:\Users\ryan9\Documents\GitHub\SpawnManager\build\reobfJar
+Working directory: D:\GitHub\SpawnManager\build\reobfJar
 Main class: net.md_5.specialsource.SpecialSource
 ====================================
 Loading mappings
@@ -86,13 +86,13 @@ Loading mappings... 50%
 0 packages, 5447 classes, 21481 fields, 38359 methods
 Remapping final jar
 Remapping jar...  1%
-Remapping jar... 10%
+Remapping jar... 11%
 Remapping jar... 20%
 Remapping jar... 30%
-Remapping jar... 41%
+Remapping jar... 40%
 Remapping jar... 50%
-Remapping jar... 60%
+Remapping jar... 61%
 Remapping jar... 70%
 Remapping jar... 80%
-Remapping jar... 91%
+Remapping jar... 90%
 Remapping jar... 100%

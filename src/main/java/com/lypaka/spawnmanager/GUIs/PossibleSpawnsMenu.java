@@ -1,8 +1,14 @@
 package com.lypaka.spawnmanager.GUIs;
 
 import ca.landonjw.gooeylibs2.api.UIManager;
+import ca.landonjw.gooeylibs2.api.button.Button;
 import ca.landonjw.gooeylibs2.api.button.GooeyButton;
+import ca.landonjw.gooeylibs2.api.button.PlaceholderButton;
+import ca.landonjw.gooeylibs2.api.button.linked.LinkType;
+import ca.landonjw.gooeylibs2.api.button.linked.LinkedPageButton;
+import ca.landonjw.gooeylibs2.api.helpers.PaginationHelper;
 import ca.landonjw.gooeylibs2.api.page.GooeyPage;
+import ca.landonjw.gooeylibs2.api.page.LinkedPage;
 import ca.landonjw.gooeylibs2.api.template.types.ChestTemplate;
 import com.google.common.reflect.TypeToken;
 import com.lypaka.areamanager.Areas.Area;
@@ -122,290 +128,86 @@ public class PossibleSpawnsMenu {
 
     }
 
-    public void open() throws ObjectMappingException {
+    public void open() {
 
-        int rows = ConfigGetters.possibleSpawnsMenuRows;
-        ChestTemplate template = ChestTemplate.builder(rows).build();
-        GooeyPage page = GooeyPage.builder()
-                .template(template)
-                .title(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle))
-                .build();
-
-        int max = 9 * rows;
-        int usable = max - 9; // bottom row reserved for border and utility buttons
-
-        Map<String, String> borderStuff = ConfigGetters.possibleSpawnsMenuSlotsMap.get("Border");
-        String id = borderStuff.get("ID");
-        String[] slotArray = borderStuff.get("Slots").split(", ");
-        for (String s : slotArray) {
-
-            page.getTemplate().getSlot(Integer.parseInt(s)).setButton(GooeyButton.builder().display(CommonButtons.getBorderStack(id)).build());
-
-        }
-
-        for (Map.Entry<String, Map<String, String>> entry : ConfigGetters.possibleSpawnsMenuSlotsMap.entrySet()) {
-
-            if (entry.getKey().contains("Slot-")) {
-
-                int slot = Integer.parseInt(entry.getKey().replace("Slot-", ""));
-                Map<String, String> data = entry.getValue();
-                String displayID = data.get("ID");
-                ItemStack displayStack = ItemStackBuilder.buildFromStringID(displayID);
-                if (data.containsKey("Display-Name")) {
-
-                    displayStack.setDisplayName(FancyText.getFormattedText(data.get("Display-Name")));
-
-                }
-                if (data.containsKey("Lore")) {
-
-                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
-                    ListNBT lore = new ListNBT();
-                    for (String l : displayLore) {
-
-                        lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l))));
-
-                    }
-
-                    displayStack.getOrCreateChildTag("display").put("Lore", lore);
-
-                }
-
-                GooeyButton button;
-                if (data.containsKey("Opens")) {
-
-                    button = GooeyButton.builder()
-                            .display(displayStack)
-                            .onClick(() -> {
-
-                                String menuToOpen = data.get("Opens");
-                                if (menuToOpen.equalsIgnoreCase("Main-Menu")) {
-
-                                    try {
-
-                                        MainMenu.open(player);
-
-                                    } catch (ObjectMappingException e) {
-
-                                        e.printStackTrace();
-
-                                    }
-
-                                }
-
-                            })
-                            .build();
-
-                } else {
-
-                    button = GooeyButton.builder()
-                            .display(displayStack)
-                            .build();
-
-                }
-
-                page.getTemplate().getSlot(slot).setButton(button);
-
-            }
-
-        }
-
+        PlaceholderButton placeholderButton = new PlaceholderButton();
+        List<Button> buttons = new ArrayList<>();
+        ItemStack borderStack = ItemStackBuilder.buildFromStringID(ConfigGetters.allSpawnMenuBorderID);
+        borderStack.setDisplayName(FancyText.getFormattedText(""));
         for (Map.Entry<Integer, ItemStack> entry : this.spawnsMap.entrySet()) {
 
-            page.getTemplate().getSlot(entry.getKey()).setButton(GooeyButton.builder().display(entry.getValue()).build());
+            GooeyButton b = GooeyButton.builder().display(entry.getValue()).build();
+            buttons.add(b);
 
         }
+        ChestTemplate template = ChestTemplate.builder(ConfigGetters.possibleSpawnsMenuRows)
+                .rectangle(0, 0, 5, 9, placeholderButton)
+                .fill(GooeyButton.builder().display(borderStack).build())
+                .set(ConfigGetters.possibleSpawnsMenuMainMenuButtonSlot, getMainMenu())
+                .set(ConfigGetters.possibleSpawnsMenuPrevPageButtonSlot, getPrev())
+                .set(ConfigGetters.possibleSpawnsMenuNextPageButtonSlot, getNext())
+                .build();
 
-        if (this.spawnsMap.size() >= usable) {
-
-            Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
-            String nextPageID = utilityMap.get("Next-Page").get("ID");
-            ItemStack next = ItemStackBuilder.buildFromStringID(nextPageID);
-            next.setDisplayName(FancyText.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
-            int slot = Integer.parseInt(utilityMap.get("Next-Page").get("Slot"));
-            GooeyButton button = GooeyButton.builder()
-                    .display(next)
-                    .onClick(() -> {
-
-                        try {
-
-                            openNext(2);
-
-                        } catch (ObjectMappingException e) {
-
-                            e.printStackTrace();
-
-                        }
-
-                    })
-                    .build();
-
-            page.getTemplate().getSlot(slot).setButton(button);
-
-        }
+        LinkedPage page = PaginationHelper.createPagesFromPlaceholders(template, buttons, null);
+        page.setTitle(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle));
+        setTitle(page);
 
         UIManager.openUIForcefully(this.player, page);
+
 
     }
 
-    // 44 usable slots per page with default settings
-    // page 2 starts at index 45 on the spawnsMap (45 - 89)
-    // 90 for page 3 (90 - 134)
+    private static void setTitle (LinkedPage page) {
 
-    // auto-calculate -> (rows * 9) - 10 = usable slots per page
+        LinkedPage next = page.getNext();
+        if (next != null) {
 
-    // ((rows * 9) - 10 * pageNum) + 1 = max index
-    // (rows * 9) - 10 * 1 = 44 + 1 = 45
-    private void openNext (int pageNum) throws ObjectMappingException {
+            next.setTitle(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle));
+            setTitle(next);
 
-        // 45 is the starting index for page 2
-        int rows = ConfigGetters.possibleSpawnsMenuRows;
-        ChestTemplate template = ChestTemplate.builder(rows).build();
-        GooeyPage page = GooeyPage.builder()
-                .template(template)
-                .title(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuTitle))
+        }
+
+    }
+
+    private static Button getMainMenu() {
+
+        ItemStack item = ItemStackBuilder.buildFromStringID(ConfigGetters.possibleSpawnsMenuMainMenuButtonID);
+        item.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuMainMenuButtonDisplayName));
+        return GooeyButton.builder().display(item).onClick(click -> {
+
+            try {
+
+                MainMenu.open(click.getPlayer());
+
+            } catch (ObjectMappingException e) {
+
+                throw new RuntimeException(e);
+
+            }
+
+        }).build();
+
+    }
+
+    private static Button getNext() {
+
+        ItemStack item = ItemStackBuilder.buildFromStringID(ConfigGetters.possibleSpawnsMenuNextPageButtonID);
+        item.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuNextPageButtonDisplayName));
+        return LinkedPageButton.builder()
+                .linkType(LinkType.Next)
+                .display(item)
                 .build();
 
-        int startingIndex = ((rows * 9) - 10) + (pageNum - 1);
-        int maxIndex = ((rows * 9) - 10) + startingIndex;
-        int currentIndex = startingIndex;
+    }
 
-        Map<String, String> borderStuff = ConfigGetters.possibleSpawnsMenuSlotsMap.get("Border");
-        String id = borderStuff.get("ID");
-        String[] slotArray = borderStuff.get("Slots").split(", ");
-        for (String s : slotArray) {
+    private static Button getPrev() {
 
-            page.getTemplate().getSlot(Integer.parseInt(s)).setButton(GooeyButton.builder().display(CommonButtons.getBorderStack(id)).build());
-
-        }
-
-        for (Map.Entry<String, Map<String, String>> entry : ConfigGetters.possibleSpawnsMenuSlotsMap.entrySet()) {
-
-            if (entry.getKey().contains("Slot-")) {
-
-                int slot = Integer.parseInt(entry.getKey().replace("Slot-", ""));
-                Map<String, String> data = entry.getValue();
-                String displayID = data.get("ID");
-                ItemStack displayStack = ItemStackBuilder.buildFromStringID(displayID);
-                if (data.containsKey("Display-Name")) {
-
-                    displayStack.setDisplayName(FancyText.getFormattedText(data.get("Display-Name")));
-
-                }
-                if (data.containsKey("Lore")) {
-
-                    List<String> displayLore = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", entry.getKey(), "Lore").getList(TypeToken.of(String.class));
-                    ListNBT lore = new ListNBT();
-                    for (String l : displayLore) {
-
-                        lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(FancyText.getFormattedText(l))));
-
-                    }
-
-                    displayStack.getOrCreateChildTag("display").put("Lore", lore);
-
-                }
-
-                GooeyButton button;
-                if (data.containsKey("Opens")) {
-
-                    button = GooeyButton.builder()
-                            .display(displayStack)
-                            .onClick(() -> {
-
-                                String menuToOpen = data.get("Opens");
-                                if (menuToOpen.equalsIgnoreCase("Main-Menu")) {
-
-                                    try {
-
-                                        MainMenu.open(player);
-
-                                    } catch (ObjectMappingException e) {
-
-                                        e.printStackTrace();
-
-                                    }
-
-                                }
-
-                            })
-                            .build();
-
-                } else {
-
-                    button = GooeyButton.builder()
-                            .display(displayStack)
-                            .build();
-
-                }
-
-                page.getTemplate().getSlot(slot).setButton(button);
-
-            }
-
-        }
-
-        for (Map.Entry<Integer, ItemStack> entry : this.spawnsMap.entrySet()) {
-
-            if (entry.getKey() >= startingIndex && entry.getKey() <= maxIndex) {
-
-                currentIndex++;
-                page.getTemplate().getSlot(entry.getKey()).setButton(GooeyButton.builder().display(entry.getValue()).build());
-
-            }
-
-        }
-
-        Map<String, Map<String, String>> utilityMap = SpawnManager.configManager.getConfigNode(2, "Spawns-Possible", "Slots", "Utility").getValue(new TypeToken<Map<String, Map<String, String>>>() {});
-        if (currentIndex >= maxIndex) {
-
-            String nextPageID = utilityMap.get("Next-Page").get("ID");
-            ItemStack next = ItemStackBuilder.buildFromStringID(nextPageID);
-            next.setDisplayName(FancyText.getFormattedText(utilityMap.get("Next-Page").get("Display-Name")));
-            int slot = Integer.parseInt(utilityMap.get("Next-Page").get("Slot"));
-            GooeyButton button = GooeyButton.builder()
-                    .display(next)
-                    .onClick(() -> {
-
-                        try {
-
-                            openNext((pageNum + 1));
-
-                        } catch (ObjectMappingException e) {
-
-                            e.printStackTrace();
-
-                        }
-
-                    })
-                    .build();
-
-            page.getTemplate().getSlot(slot).setButton(button);
-
-        }
-
-        String previousPageID = utilityMap.get("Prev-Page").get("ID");
-        ItemStack prev = ItemStackBuilder.buildFromStringID(previousPageID);
-        prev.setDisplayName(FancyText.getFormattedText(utilityMap.get("Prev-Page").get("Display-Name")));
-        int slot = Integer.parseInt(utilityMap.get("Prev-Page").get("Slot"));
-        GooeyButton button = GooeyButton.builder()
-                        .display(prev)
-                        .onClick(() -> {
-
-                            try {
-
-                                openNext((pageNum - 1));
-
-                            } catch (ObjectMappingException e) {
-
-                                e.printStackTrace();
-
-                            }
-
-                        })
-                        .build();
-        page.getTemplate().getSlot(slot).setButton(button);
-
-        UIManager.openUIForcefully(this.player, page);
+        ItemStack item = ItemStackBuilder.buildFromStringID(ConfigGetters.possibleSpawnsMenuPrevPageButtonID);
+        item.setDisplayName(FancyText.getFormattedText(ConfigGetters.possibleSpawnsMenuPrevPageButtonDisplayName));
+        return LinkedPageButton.builder()
+                .linkType(LinkType.Previous)
+                .display(item)
+                .build();
 
     }
 
