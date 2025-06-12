@@ -21,9 +21,11 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -132,7 +134,7 @@ public class PossibleSpawnsMenu {
 
         PlaceholderButton placeholderButton = new PlaceholderButton();
         List<Button> buttons = new ArrayList<>();
-        ItemStack borderStack = ItemStackHandler.buildFromStringID(ConfigGetters.allSpawnMenuBorderID);
+        ItemStack borderStack = ItemStackHandler.buildFromStringID(ConfigGetters.possibleSpawnMenuBorderID);
         borderStack.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(""));
         for (Map.Entry<Integer, ItemStack> entry : this.spawnsMap.entrySet()) {
 
@@ -173,6 +175,13 @@ public class PossibleSpawnsMenu {
 
         ItemStack item = ItemStackHandler.buildFromStringID(ConfigGetters.possibleSpawnsMenuMainMenuButtonID);
         item.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuMainMenuButtonDisplayName));
+        List<Text> lore = new ArrayList<>();
+        for (String l : ConfigGetters.possibleSpawnsMenuMainMenuButtonLore) {
+
+            lore.add(FancyTextHandler.getFormattedText(l));
+
+        }
+        item.set(DataComponentTypes.LORE, new LoreComponent(lore));
         return GooeyButton.builder().display(item).onClick(click -> {
 
             try {

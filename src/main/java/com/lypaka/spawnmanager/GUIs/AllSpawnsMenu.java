@@ -19,8 +19,10 @@ import com.lypaka.spawnmanager.GUIs.SpawnLists.AllSpawnsList;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 import java.util.*;
 
@@ -138,6 +140,13 @@ public class AllSpawnsMenu {
 
         ItemStack item = ItemStackHandler.buildFromStringID(ConfigGetters.allSpawnsMenuMainMenuButtonID);
         item.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.allSpawnsMenuMainMenuButtonDisplayName));
+        List<Text> lore = new ArrayList<>();
+        for (String l : ConfigGetters.allSpawnsMenuMainMenuButtonLore) {
+
+            lore.add(FancyTextHandler.getFormattedText(l));
+
+        }
+        item.set(DataComponentTypes.LORE, new LoreComponent(lore));
         return GooeyButton.builder().display(item).onClick(click -> {
 
             try {
