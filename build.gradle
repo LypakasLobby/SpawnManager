@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 
 
 group = 'com.lypaka'
-version = '1.16.5-2.0.5'
+version = '1.16.5-2.0.7'
 
 java {
     archivesBaseName = 'SpawnManager'
@@ -109,7 +109,7 @@ dependencies {
     compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['LypakaUtils-1.16.5.jar'])
     compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['Reforged.jar'])
     compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['GooeyLibs-1.16.5.jar'])
-    compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['AreaManager-1.16.5-1.1.0.jar'])
+    compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['AreaManager-1.16.5-1.2.1.jar'])
     compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['HostilePokemon-1.16.5-1.2.0.jar'])
     compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['TotemPokemon-1.16.5-1.0.0.jar'])
     compileOnly fileTree(dir: 'D:\\GitHub\\LIBRARIES', include: ['TitanPokemon-1.16.5-1.1.0.jar'])

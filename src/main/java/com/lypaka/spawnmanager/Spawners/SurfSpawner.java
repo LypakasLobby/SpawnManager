@@ -14,6 +14,7 @@ import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
 import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
 import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
+import com.lypaka.spawnmanager.Utils.MiscUtils;
 import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
@@ -108,6 +109,7 @@ public class SurfSpawner {
                 if (spawnArea.getSurfSpawnerSettings().getBlockIDs().contains(blockID)) {
 
                     if (spawnArea.getSurfSpawnerSettings().doesAutoBattle() && BattleRegistry.getBattle(player) != null) break;
+                    if (spawnArea.getSurfSpawnerSettings().doesAutoBattle() && !MiscUtils.canPlayerBattle(player)) break;
                     AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                     if (spawns.getSurfSpawns().size() > 0) {
 

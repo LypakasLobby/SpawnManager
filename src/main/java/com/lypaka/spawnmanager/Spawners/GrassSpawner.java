@@ -15,6 +15,7 @@ import com.lypaka.spawnmanager.Utils.ExternalModules.HostileManager;
 import com.lypaka.spawnmanager.Utils.ExternalModules.TitanManager;
 import com.lypaka.spawnmanager.Utils.ExternalModules.TotemManager;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
+import com.lypaka.spawnmanager.Utils.MiscUtils;
 import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
@@ -23,6 +24,7 @@ import com.pixelmonmod.pixelmon.api.util.helpers.RandomHelper;
 import com.pixelmonmod.pixelmon.api.world.WorldTime;
 import com.pixelmonmod.pixelmon.battles.BattleRegistry;
 import com.pixelmonmod.pixelmon.battles.api.rules.BattleRules;
+import com.pixelmonmod.pixelmon.battles.attacks.specialAttacks.basic.RagingBull;
 import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.battles.controller.participants.WildPixelmonParticipant;
@@ -114,6 +116,7 @@ public class GrassSpawner {
                 if (spawnArea.getGrassSpawnerSettings().getBlockIDs().contains(blockID)) {
 
                     if (spawnArea.getGrassSpawnerSettings().doesAutoBattle() && BattleRegistry.getBattle(player) != null) break;
+                    if (spawnArea.getGrassSpawnerSettings().doesAutoBattle() && !MiscUtils.canPlayerBattle(player)) break;
                     AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                     if (spawns.getGrassSpawns().size() > 0) {
 
