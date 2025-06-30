@@ -19,6 +19,7 @@ import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.PokemonSpawn;
 import com.lypaka.spawnmanager.Utils.ExternalAbilities.*;
 import com.lypaka.spawnmanager.Utils.HeldItemUtils;
+import com.lypaka.spawnmanager.Utils.MiscUtils;
 import com.lypaka.spawnmanager.Utils.PokemonSpawnBuilder;
 import kotlin.Unit;
 import net.minecraft.block.BlockState;
@@ -103,6 +104,7 @@ public class SurfSpawner implements PlayerWaterMovementCallback {
                 if (spawnArea.getSurfSpawnerSettings().getBlockIDs().contains(blockID)) {
 
                     if (spawnArea.getSurfSpawnerSettings().doesAutoBattle() && BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) != null) break;
+                    if (spawnArea.getSurfSpawnerSettings().doesAutoBattle() && !MiscUtils.canPlayerBattle(player)) break;
                     AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
                     if (!spawns.getSurfSpawns().isEmpty()) {
 
@@ -206,11 +208,20 @@ public class SurfSpawner implements PlayerWaterMovementCallback {
                                     player.sendMessage(FancyTextHandler.getFormattedText(message.replace("%pokemon%", finalToSpawn.getSpecies().getName())), true);
 
                                 }
-                                if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) == null) {
+                                Timer t = new Timer();
+                                t.schedule(new TimerTask() {
 
-                                    BattleBuilder.INSTANCE.pve(player, entity).ifSuccessful(function -> Unit.INSTANCE);
+                                    @Override
+                                    public void run() {
 
-                                }
+                                        if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) == null) {
+
+                                            BattleBuilder.INSTANCE.pve(player, entity, null).ifSuccessful(function -> Unit.INSTANCE);
+
+                                        }
+                                    }
+
+                                }, 10);
 
                             }
 

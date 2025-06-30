@@ -26,8 +26,8 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation files("D:/GitHub/LIBRARIES/LypakaUtils-Fabric-1.21.1-0.0.1-dev.jar")
-    modImplementation files("D:/GitHub/LIBRARIES/AreaManager-1.21.1-1.2.0.jar")
+    modImplementation files("D:/GitHub/LIBRARIES/LypakaUtils-Fabric-1.21.1.jar")
+    modImplementation files("D:/GitHub/LIBRARIES/AreaManager-1.21.1-1.2.1.jar")
     modImplementation "com.cobblemon:fabric:1.6.0+1.21.1-SNAPSHOT"
     modImplementation(include("ca.landonjw.gooeylibs:fabric-api-repack:3.1.0-1.21.1-SNAPSHOT"))
 }

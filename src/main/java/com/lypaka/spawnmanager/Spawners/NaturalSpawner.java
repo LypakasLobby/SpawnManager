@@ -366,11 +366,20 @@ public class NaturalSpawner {
                                                     // only one Pokemon spawned, so we check for the auto battle stuff
                                                     if (RandomHandler.getRandomChance(currentSpawnArea.getNaturalSpawnerSettings().getAutoBattleChance())) {
 
-                                                        if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) == null) {
+                                                        Timer t = new Timer();
+                                                        t.schedule(new TimerTask() {
 
-                                                            BattleBuilder.INSTANCE.pve(player, entity).ifSuccessful(function -> Unit.INSTANCE);
+                                                            @Override
+                                                            public void run() {
 
-                                                        }
+                                                                if (BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) == null) {
+
+                                                                    BattleBuilder.INSTANCE.pve(player, entity, null).ifSuccessful(function -> Unit.INSTANCE);
+
+                                                                }
+                                                            }
+
+                                                        }, 10);
 
                                                     }
 

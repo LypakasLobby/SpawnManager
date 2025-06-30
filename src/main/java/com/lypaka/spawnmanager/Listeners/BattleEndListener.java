@@ -284,171 +284,179 @@ public class BattleEndListener {
                 String spawner = null;
                 for (PokemonEntity ent : entities) {
 
-                    if (FishSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+                    try {
 
-                        spawner = "Fish";
+                        if (FishSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
-                    } else if (GrassSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+                            spawner = "Fish";
 
-                        spawner = "Grass";
+                        } else if (GrassSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
-                    } else if (HeadbuttSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+                            spawner = "Grass";
 
-                        spawner = "Headbutt";
+                        } else if (HeadbuttSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
-                    } else if (NaturalSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+                            spawner = "Headbutt";
 
-                        spawner = "Natural";
+                        } else if (NaturalSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
-                    } else if (RockSmashSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+                            spawner = "Natural";
 
-                        spawner = "RockSmash";
+                        } else if (RockSmashSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
-                    } else if (SurfSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+                            spawner = "RockSmash";
 
-                        spawner = "Surf";
+                        } else if (SurfSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
-                    }
-                    if (spawner == null) return Unit.INSTANCE;
-                    SpawnArea areaSpawns = SpawnAreaHandler.areaMap.get(currentArea);
-                    switch (spawner) {
+                            spawner = "Surf";
 
-                        case "Fish":
-                            if (areaSpawns.getFishSpawnerSettings().doesDespawnAfterBattle()) {
+                        }
+                        if (spawner == null) return Unit.INSTANCE;
+                        SpawnArea areaSpawns = SpawnAreaHandler.areaMap.get(currentArea);
+                        switch (spawner) {
 
-                                FishSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+                            case "Fish":
+                                if (areaSpawns.getFishSpawnerSettings().doesDespawnAfterBattle()) {
 
-                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+                                    FishSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
 
-                                        if (!ent.isBattling()) {
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
 
-                                            ent.remove(Entity.RemovalReason.DISCARDED);
+                                            if (!ent.isBattling()) {
 
-                                        }
-                                        return true;
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
 
-                                    }
-
-                                    return false;
-
-                                });
-
-                            }
-                            break;
-
-                        case "Grass":
-                            if (areaSpawns.getGrassSpawnerSettings().doesDespawnAfterBattle()) {
-
-                                GrassSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
-
-                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
-
-                                        if (!ent.isBattling()) {
-
-                                            ent.remove(Entity.RemovalReason.DISCARDED);
+                                            }
+                                            return true;
 
                                         }
-                                        return true;
 
-                                    }
+                                        return false;
 
-                                    return false;
+                                    });
 
-                                });
+                                }
+                                break;
 
-                            }
+                            case "Grass":
+                                if (areaSpawns.getGrassSpawnerSettings().doesDespawnAfterBattle()) {
 
-                        case "Headbutt":
-                            if (areaSpawns.getHeadbuttSpawnerSettings().doesDespawnAfterBattle()) {
+                                    GrassSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
 
-                                HeadbuttSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
 
-                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+                                            if (!ent.isBattling()) {
 
-                                        if (!ent.isBattling()) {
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
 
-                                            ent.remove(Entity.RemovalReason.DISCARDED);
-
-                                        }
-                                        return true;
-
-                                    }
-
-                                    return false;
-
-                                });
-
-                            }
-                            break;
-
-                        case "Natural":
-                            if (areaSpawns.getNaturalSpawnerSettings().doesDespawnAfterBattle()) {
-
-                                NaturalSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
-
-                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
-
-                                        if (!ent.isBattling()) {
-
-                                            ent.remove(Entity.RemovalReason.DISCARDED);
+                                            }
+                                            return true;
 
                                         }
-                                        return true;
 
-                                    }
+                                        return false;
 
-                                    return false;
+                                    });
 
-                                });
+                                }
 
-                            }
-                            break;
+                            case "Headbutt":
+                                if (areaSpawns.getHeadbuttSpawnerSettings().doesDespawnAfterBattle()) {
 
-                        case "RockSmash":
-                            if (areaSpawns.getRockSmashSpawnerSettings().doesDespawnAfterBattle()) {
+                                    HeadbuttSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
 
-                                RockSmashSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
 
-                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+                                            if (!ent.isBattling()) {
 
-                                        if (!ent.isBattling()) {
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
 
-                                            ent.remove(Entity.RemovalReason.DISCARDED);
-
-                                        }
-                                        return true;
-
-                                    }
-
-                                    return false;
-
-                                });
-
-                            }
-                            break;
-
-                        case "Surf":
-                            if (areaSpawns.getSurfSpawnerSettings().doesDespawnAfterBattle()) {
-
-                                SurfSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
-
-                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
-
-                                        if (!ent.isBattling()) {
-
-                                            ent.remove(Entity.RemovalReason.DISCARDED);
+                                            }
+                                            return true;
 
                                         }
-                                        return true;
 
-                                    }
+                                        return false;
 
-                                    return false;
+                                    });
 
-                                });
+                                }
+                                break;
 
-                            }
-                            break;
+                            case "Natural":
+                                if (areaSpawns.getNaturalSpawnerSettings().doesDespawnAfterBattle()) {
+
+                                    NaturalSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+
+                                            if (!ent.isBattling()) {
+
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
+
+                                            }
+                                            return true;
+
+                                        }
+
+                                        return false;
+
+                                    });
+
+                                }
+                                break;
+
+                            case "RockSmash":
+                                if (areaSpawns.getRockSmashSpawnerSettings().doesDespawnAfterBattle()) {
+
+                                    RockSmashSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+
+                                            if (!ent.isBattling()) {
+
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
+
+                                            }
+                                            return true;
+
+                                        }
+
+                                        return false;
+
+                                    });
+
+                                }
+                                break;
+
+                            case "Surf":
+                                if (areaSpawns.getSurfSpawnerSettings().doesDespawnAfterBattle()) {
+
+                                    SurfSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+
+                                            if (!ent.isBattling()) {
+
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
+
+                                            }
+                                            return true;
+
+                                        }
+
+                                        return false;
+
+                                    });
+
+                                }
+                                break;
+
+                        }
+
+                    } catch (Exception e) {
+
+                        // do nothing, lazy fix for an error
 
                     }
 
