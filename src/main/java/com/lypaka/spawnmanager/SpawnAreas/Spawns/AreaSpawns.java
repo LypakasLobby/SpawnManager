@@ -7,6 +7,7 @@ import java.util.List;
 public class AreaSpawns {
 
     private final SpawnArea area;
+    private final List<CaveSpawn> caveSpawns;
     private final List<FishSpawn> fishSpawns;
     private final List<GrassSpawn> grassSpawns;
     private final List<HeadbuttSpawn> headbuttSpawns;
@@ -14,9 +15,10 @@ public class AreaSpawns {
     private final List<RockSmashSpawn> rockSmashSpawns;
     private final List<SurfSpawn> surfSpawns;
 
-    public AreaSpawns (SpawnArea area, List<FishSpawn> fish, List<GrassSpawn> grass, List<HeadbuttSpawn> headbutt, List<NaturalSpawn> natural, List<RockSmashSpawn> rockSmash, List<SurfSpawn> surf) {
+    public AreaSpawns (SpawnArea area, List<CaveSpawn> caveSpawns, List<FishSpawn> fish, List<GrassSpawn> grass, List<HeadbuttSpawn> headbutt, List<NaturalSpawn> natural, List<RockSmashSpawn> rockSmash, List<SurfSpawn> surf) {
 
         this.area = area;
+        this.caveSpawns = caveSpawns;
         this.fishSpawns = fish;
         this.grassSpawns = grass;
         this.headbuttSpawns = headbutt;
@@ -29,6 +31,12 @@ public class AreaSpawns {
     public SpawnArea getArea() {
 
         return this.area;
+
+    }
+
+    public List<CaveSpawn> getCaveSpawns() {
+
+        return this.caveSpawns;
 
     }
 

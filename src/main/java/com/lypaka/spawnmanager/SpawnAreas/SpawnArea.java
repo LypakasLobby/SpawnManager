@@ -6,6 +6,7 @@ import com.lypaka.spawnmanager.SpawnAreas.SpawnerSettings.*;
 public class SpawnArea {
 
     private final Area area;
+    private final CaveSpawnerSettings caveSpawnerSettings;
     private final FishSpawnerSettings fishSpawnerSettings;
     private final GrassSpawnerSettings grassSpawnerSettings;
     private final HeadbuttSpawnerSettings headbuttSpawnerSettings;
@@ -13,10 +14,11 @@ public class SpawnArea {
     private final RockSmashSpawnerSettings rockSmashSpawnerSettings;
     private final SurfSpawnerSettings surfSpawnerSettings;
 
-    public SpawnArea (Area area, FishSpawnerSettings fishSpawnerSettings, GrassSpawnerSettings grassSpawnerSettings, HeadbuttSpawnerSettings headbuttSpawnerSettings,
+    public SpawnArea (Area area, CaveSpawnerSettings caveSpawnerSettings, FishSpawnerSettings fishSpawnerSettings, GrassSpawnerSettings grassSpawnerSettings, HeadbuttSpawnerSettings headbuttSpawnerSettings,
                       NaturalSpawnerSettings naturalSpawnerSettings, RockSmashSpawnerSettings rockSmashSpawnerSettings, SurfSpawnerSettings surfSpawnerSettings) {
 
         this.area = area;
+        this.caveSpawnerSettings = caveSpawnerSettings;
         this.fishSpawnerSettings = fishSpawnerSettings;
         this.grassSpawnerSettings = grassSpawnerSettings;
         this.headbuttSpawnerSettings = headbuttSpawnerSettings;
@@ -35,6 +37,12 @@ public class SpawnArea {
     public void create() {
 
         SpawnAreaHandler.areaMap.put(this.area, this);
+
+    }
+
+    public CaveSpawnerSettings getCaveSpawnerSettings() {
+
+        return this.caveSpawnerSettings;
 
     }
 

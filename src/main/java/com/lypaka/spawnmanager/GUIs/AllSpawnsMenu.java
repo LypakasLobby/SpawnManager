@@ -79,6 +79,11 @@ public class AllSpawnsMenu {
                 AllSpawnsList.buildSurf(spawns, m1, m2, m3);
 
             }
+            if (!spawns.getCaveSpawns().isEmpty()) {
+
+                AllSpawnsList.buildCave(spawns, m1, m2, m3);
+
+            }
 
         }
 

@@ -695,4 +695,113 @@ public class PossibleSpawnsList {
 
     }
 
+    public static void buildCave (String playerTime, String playerWeather, AreaSpawns spawns, Map<UUID, Pokemon> m1, Map<Pokemon, ItemStack> m2, Map<Integer, UUID> m3) {
+
+        for (CaveSpawn cave : spawns.getCaveSpawns()) {
+
+            String speciesName = cave.getSpeciesName();
+            String form = cave.getForm();
+            Pokemon p = cave.buildAndGetPokemon();
+            if (!form.equalsIgnoreCase("default")) {
+
+                p.setForm(cave.getSpecies().getFormByName(form));
+
+            }
+            String levelRange = cave.getMinLevel() + " - " + cave.getMaxLevel();
+            Map<String, Map<String, Map<String, String>>> data = cave.getSpawnData();
+            for (Map.Entry<String, Map<String, Map<String, String>>> d1 : data.entrySet()) {
+
+                String time = d1.getKey();
+                if (time.equalsIgnoreCase(playerTime)) {
+
+                    Map<String, Map<String, String>> data2 = d1.getValue();
+                    for (Map.Entry<String, Map<String, String>> d2 : data2.entrySet()) {
+
+                        String weather = d2.getKey();
+                        if (weather.equalsIgnoreCase(playerWeather)) {
+
+                            double spawnChance = Double.parseDouble(d2.getValue().get("Spawn-Chance"));
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String spawnChanceDisplay = df.format(spawnChance * 100) + "%";
+                            ItemStack sprite = PokemonItem.from(p);
+                            sprite.set(DataComponentTypes.CUSTOM_NAME, FancyTextHandler.getFormattedText(ConfigGetters.possibleSpawnsMenuFormatName.replace("%pokemonName%", p.getSpecies().getName())));
+                            List<String> configLore = new ArrayList<>(ConfigGetters.possibleSpawnsMenuFormatLore);
+                            configLore.removeIf(e -> e.contains("Rod Types"));
+                            configLore.removeIf(e -> e.contains("Wood Types"));
+                            configLore.removeIf(e -> e.contains("Stone Types"));
+                            configLore.removeIf(e -> e.contains("Time")); // removing time, weather and location because that information is irrelevent here
+                            configLore.removeIf(e -> e.contains("Weather"));
+                            configLore.removeIf(e -> e.contains("Location"));
+                            List<String> heldItems = new ArrayList<>();
+                            boolean doHeldItems = false;
+                            for (String s : configLore) {
+
+                                if (s.contains("%heldItems%")) {
+
+                                    doHeldItems = true;
+                                    break;
+
+                                }
+
+                            }
+                            if (doHeldItems) {
+
+                                configLore.removeIf(e -> e.contains("%heldItems%"));
+                                if (HeldItemUtils.heldItemMap.containsKey(speciesName.toLowerCase())) {
+
+                                    Map<String, List<String>> possibleItems = HeldItemUtils.heldItemMap.get(speciesName.toLowerCase());
+                                    for (Map.Entry<String, List<String>> entry : possibleItems.entrySet()) {
+
+                                        String percent = entry.getKey();
+                                        String formatting = "&c";
+                                        if (percent.contains("1")) formatting = "&4&l";
+                                        if (percent.contains("5")) formatting = "&e&l";
+                                        if (percent.contains("30")) formatting = "&c";
+                                        if (percent.contains("50")) formatting = "&b";
+                                        if (percent.contains("100")) formatting = "&a";
+                                        for (String s : entry.getValue()) {
+
+                                            heldItems.add(FancyTextHandler.getFormattedString(formatting + percent + " -> " + s));
+
+                                        }
+
+                                    }
+
+                                } else {
+
+                                    heldItems.add(FancyTextHandler.getFormattedString("&cNone"));
+
+                                }
+                                configLore.addAll(heldItems);
+
+                            }
+                            List<Text> lore = new ArrayList<>();
+                            for (String l : configLore) {
+
+                                lore.add(FancyTextHandler.getFormattedText(l
+                                        .replace("%form%", form)
+                                        .replace("%levelRange%", levelRange)
+                                        .replace("%spawner%", "Surf Spawner")
+                                        .replace("%spawnChance%", spawnChanceDisplay)
+                                ));
+
+                            }
+                            sprite.set(DataComponentTypes.LORE, new LoreComponent(lore));
+                            UUID rand = UUID.randomUUID();
+                            m1.put(rand, p);
+                            m2.put(p, sprite);
+                            m3.put(p.getSpecies().getNationalPokedexNumber(), rand);
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
 }

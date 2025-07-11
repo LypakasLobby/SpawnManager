@@ -114,6 +114,11 @@ public class PossibleSpawnsMenu {
                 PossibleSpawnsList.buildSurf(time, weather, spawns, m1, m2, m3);
 
             }
+            if (!spawns.getCaveSpawns().isEmpty()) {
+
+                PossibleSpawnsList.buildCave(time, weather, spawns, m1, m2, m3);
+
+            }
 
         }
 

@@ -590,4 +590,106 @@ public class PokemonSpawnBuilder {
 
     }
 
+    public static Map<PokemonSpawn, Double> buildCaveSpawnList (String time, String weather, String location, AreaSpawns spawns, double modifier) {
+
+        List<CaveSpawn> caveSpawns = spawns.getCaveSpawns();
+        Map<PokemonSpawn, Double> pokemonMap = new HashMap<>();
+        if (caveSpawns.isEmpty()) return pokemonMap;
+
+        Map<CaveSpawn, Map<String, String>> m1 = new HashMap<>();
+        Map<Double, List<CaveSpawn>> m2 = new HashMap<>();
+        for (CaveSpawn c : caveSpawns) {
+
+            Map<String, Map<String, Map<String, String>>> spawnData = c.getSpawnData();
+            Map<String, Map<String, String>> innerData;
+            if (spawnData.containsKey(time)) {
+
+                innerData = spawnData.get(time);
+
+            } else if (spawnData.containsKey("Any")) {
+
+                innerData = spawnData.get("Any");
+
+            } else {
+
+                continue;
+
+            }
+
+            Map<String, String> data;
+            if (innerData.containsKey(weather)) {
+
+                data = innerData.get(weather);
+
+            } else if (innerData.containsKey("Any")) {
+
+                data = innerData.get("Any");
+
+            } else {
+
+                continue;
+
+            }
+
+            String locationTypes = data.get("Spawn-Location");
+            boolean canSpawnHere = false;
+            if (locationTypes.contains(", ")) {
+
+                String[] split = locationTypes.split(", ");
+                for (String l : split) {
+
+                    if (l.equalsIgnoreCase(location)) {
+
+                        canSpawnHere = true;
+                        break;
+
+                    }
+
+                }
+
+            } else {
+
+                canSpawnHere = location.equalsIgnoreCase(locationTypes);
+
+            }
+
+            if (!canSpawnHere) continue;
+
+
+            double spawnChance = Double.parseDouble(data.get("Spawn-Chance"));
+            m1.put(c, data);
+            spawnChance = spawnChance * modifier;
+            List<CaveSpawn> list = new ArrayList<>();
+            if (m2.containsKey(spawnChance)) {
+
+                list = m2.get(spawnChance);
+
+            }
+            list.add(c);
+            m2.put(spawnChance, list);
+
+        }
+
+        List<Double> chances = new ArrayList<>(m2.keySet());
+        Collections.sort(chances);
+
+        for (int i = chances.size() - 1; i >= 0; i--) {
+
+            if (RandomHandler.getRandomChance(chances.get(i))) {
+
+                List<CaveSpawn> spawnList = m2.get(chances.get(i));
+                for (CaveSpawn spawn : spawnList) {
+
+                    pokemonMap.put(spawn, chances.get(i));
+
+                }
+
+            }
+
+        }
+
+        return pokemonMap;
+
+    }
+
 }

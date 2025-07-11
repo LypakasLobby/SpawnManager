@@ -13,6 +13,7 @@ import com.lypaka.lypakautils.API.PlayerWaterMovementCallback;
 import com.lypaka.lypakautils.Handlers.FancyTextHandler;
 import com.lypaka.lypakautils.Handlers.RandomHandler;
 import com.lypaka.lypakautils.Handlers.WorldTimeHandler;
+import com.lypaka.spawnmanager.Listeners.TickListener;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnArea;
 import com.lypaka.spawnmanager.SpawnAreas.SpawnAreaHandler;
 import com.lypaka.spawnmanager.SpawnAreas.Spawns.AreaSpawns;
@@ -39,6 +40,8 @@ public class SurfSpawner implements PlayerWaterMovementCallback {
 
         if (!player.isCreative() && !player.isSpectator()) {
 
+            if (TickListener.timeBetweenSurfSpawns.containsKey(player.getUuid())) return;
+            TickListener.timeBetweenSurfSpawns.put(player.getUuid(), 0);
             int x = player.getBlockPos().getX();
             int y = player.getBlockPos().getY();
             int z = player.getBlockPos().getZ();
@@ -101,6 +104,7 @@ public class SurfSpawner implements PlayerWaterMovementCallback {
 
                 Area currentArea = sortedAreas.get(i);
                 SpawnArea spawnArea = SpawnAreaHandler.areaMap.get(currentArea);
+                if (!RandomHandler.getRandomChance(spawnArea.getSurfSpawnerSettings().getSpawnChance())) continue;
                 if (spawnArea.getSurfSpawnerSettings().getBlockIDs().contains(blockID)) {
 
                     if (spawnArea.getSurfSpawnerSettings().doesAutoBattle() && BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) != null) break;

@@ -31,7 +31,7 @@ import net.minecraft.world.World;
 
 import java.util.*;
 
-public class GrassSpawner implements PlayerLandMovementCallback {
+public class CaveSpawner implements PlayerLandMovementCallback {
 
     public static List<UUID> spawnedPokemonUUIDs = new ArrayList<>(); // used for battle end event listener to check for to despawn Pokemon or not
 
@@ -40,8 +40,8 @@ public class GrassSpawner implements PlayerLandMovementCallback {
 
         if (!player.isCreative() && !player.isSpectator()) {
 
-            if (TickListener.timeBetweenGrassSpawns.containsKey(player.getUuid())) return;
-            TickListener.timeBetweenGrassSpawns.put(player.getUuid(), 0);
+            if (TickListener.timeBetweenCaveSpawns.containsKey(player.getUuid())) return;
+            TickListener.timeBetweenCaveSpawns.put(player.getUuid(), 0);
             int x = player.getBlockPos().getX();
             int y = player.getBlockPos().getY();
             int z = player.getBlockPos().getZ();
@@ -98,7 +98,7 @@ public class GrassSpawner implements PlayerLandMovementCallback {
 
             }
 
-            BlockPos pos = player.getBlockPos();
+            BlockPos pos = new BlockPos(x, y - 1, z);
             BlockState state = world.getBlockState(pos);
             String blockID = Registries.BLOCK.getId(state.getBlock()).toString();
             if (blockID.equalsIgnoreCase("air")) location = "air";
@@ -107,15 +107,15 @@ public class GrassSpawner implements PlayerLandMovementCallback {
 
                 Area currentArea = sortedAreas.get(i);
                 SpawnArea spawnArea = SpawnAreaHandler.areaMap.get(currentArea);
-                if (!RandomHandler.getRandomChance(spawnArea.getGrassSpawnerSettings().getSpawnChance())) continue;
-                if (spawnArea.getGrassSpawnerSettings().getBlockIDs().contains(blockID)) {
+                if (!RandomHandler.getRandomChance(spawnArea.getCaveSpawnerSettings().getSpawnChance())) continue;
+                if (spawnArea.getCaveSpawnerSettings().getBlockIDs().contains(blockID)) {
 
-                    if (spawnArea.getGrassSpawnerSettings().doesAutoBattle() && BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) != null) break;
-                    if (spawnArea.getGrassSpawnerSettings().doesAutoBattle() && !MiscUtils.canPlayerBattle(player)) break;
+                    if (spawnArea.getCaveSpawnerSettings().doesAutoBattle() && BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player) != null) break;
+                    if (spawnArea.getCaveSpawnerSettings().doesAutoBattle() && !MiscUtils.canPlayerBattle(player)) break;
                     AreaSpawns spawns = SpawnAreaHandler.areaSpawnMap.get(spawnArea);
-                    if (!spawns.getGrassSpawns().isEmpty()) {
+                    if (!spawns.getCaveSpawns().isEmpty()) {
 
-                        Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildGrassSpawnsList(time, weather, location, spawns, modifier);
+                        Map<PokemonSpawn, Double> pokemon = PokemonSpawnBuilder.buildCaveSpawnList(time, weather, location, spawns, modifier);
                         Map<Pokemon, PokemonSpawn> mapForHustle = new HashMap<>();
                         for (Map.Entry<PokemonSpawn, Double> p : pokemon.entrySet()) {
 
@@ -198,12 +198,12 @@ public class GrassSpawner implements PlayerLandMovementCallback {
                         player.getWorld().getServer().executeSync(() -> {
 
                             player.getWorld().spawnEntity(entity);
-                            if (spawnArea.getGrassSpawnerSettings().doesDespawnAfterBattle()) {
+                            if (spawnArea.getCaveSpawnerSettings().doesDespawnAfterBattle()) {
 
                                 spawnedPokemonUUIDs.add(entity.getUuid());
 
                             }
-                            if (spawnArea.getGrassSpawnerSettings().doesAutoBattle()) {
+                            if (spawnArea.getCaveSpawnerSettings().doesAutoBattle()) {
 
                                 String messageType = "";
                                 if (finalToSpawn.getShiny()) {
@@ -212,7 +212,7 @@ public class GrassSpawner implements PlayerLandMovementCallback {
 
                                 }
                                 messageType = "Spawn-Message" + messageType;
-                                String message = spawnArea.getGrassSpawnerSettings().getMessagesMap().get(messageType);
+                                String message = spawnArea.getCaveSpawnerSettings().getMessagesMap().get(messageType);
                                 if (!message.equalsIgnoreCase("")) {
 
                                     player.sendMessage(FancyTextHandler.getFormattedText(message.replace("%pokemon%", finalToSpawn.getSpecies().getName())), true);

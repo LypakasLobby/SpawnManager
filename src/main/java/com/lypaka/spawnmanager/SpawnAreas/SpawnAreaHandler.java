@@ -44,6 +44,34 @@ public class SpawnAreaHandler {
                 BasicConfigManager bcm = new BasicConfigManager(files, dir, SpawnManager.class, SpawnManager.MOD_NAME, SpawnManager.MOD_ID, SpawnManager.logger);
                 bcm.init();
 
+                boolean autoCaveBattle = true;
+                List<String> caveBlockIDs = new ArrayList<>();
+                boolean despawnAfterCaveBattle = true;
+                Map<String, String> caveMessages = new HashMap<>();
+                caveMessages.put("Spawn-Message", "&eA wild &b%pokemon%&e appeared!");
+                caveMessages.put("Spawn-Message-Shiny", "&eA wild &4%pokemon%&e appeared!");
+                double caveSpawnChance = 0.35;
+                if (bcm.getConfigNode(0, "Cave-Spawner").isVirtual()) {
+
+                    bcm.getConfigNode(0, "Cave-Spawner", "Auto-Battle").setValue(autoCaveBattle);
+                    bcm.getConfigNode(0, "Cave-Spawner", "Block-IDs").setValue(caveBlockIDs);
+                    bcm.getConfigNode(0, "Cave-Spawner", "Despawn-After-Battle").setValue(despawnAfterCaveBattle);
+                    bcm.getConfigNode(0, "Cave-Spawner", "Messages").setValue(caveMessages);
+                    bcm.getConfigNode(0, "Cave-Spawner", "Spawn-Attempt-Chance").setValue(caveSpawnChance);
+                    bcm.getConfigNode(0, "Cave-Spawns").setValue(new ArrayList<>());
+                    bcm.save();
+
+                } else {
+
+                    autoCaveBattle = bcm.getConfigNode(0, "Cave-Spawner", "Auto-Battle").getBoolean();
+                    caveBlockIDs = bcm.getConfigNode(0, "Cave-Spawner", "Block-IDs").getList(TypeToken.of(String.class));
+                    despawnAfterCaveBattle = bcm.getConfigNode(0, "Cave-Spawner", "Despawn-After-Battle").getBoolean();
+                    caveMessages = bcm.getConfigNode(0, "Cave-Spawner", "Messages").getValue(new TypeToken<Map<String, String>>() {});
+                    caveSpawnChance = bcm.getConfigNode(0, "Cave-Spawner", "Spawn-Attempt-Chance").getDouble();
+
+                }
+                CaveSpawnerSettings caveSpawnerSettings = new CaveSpawnerSettings(autoCaveBattle, caveBlockIDs, despawnAfterCaveBattle, caveMessages, caveSpawnChance);
+
                 boolean clearFishSpawns = bcm.getConfigNode(0, "Fish-Spawner", "Clear-Spawns").getBoolean();
                 boolean despawnAfterFishBattle = bcm.getConfigNode(0, "Fish-Spawner", "Despawn-After-Battle").getBoolean();
                 int fishDespawnTimer = bcm.getConfigNode(0, "Fish-Spawner", "Despawn-Timer").getInt();
@@ -97,10 +125,27 @@ public class SpawnAreaHandler {
                 double surfSpawnChance = bcm.getConfigNode(0, "Surf-Spawner", "Spawn-Attempt-Chance").getDouble();
                 SurfSpawnerSettings surfSpawnerSettings = new SurfSpawnerSettings(autoSurfBattle, surfBlockIDs, despawnAfterSurfBattle, surfMessages, surfSpawnChance);
 
-                SpawnArea a = new SpawnArea(area, fishSpawnerSettings, grassSpawnerSettings, headbuttSpawnerSettings, naturalSpawnerSettings, rockSmashSpawnerSettings, surfSpawnerSettings);
+                SpawnArea a = new SpawnArea(area, caveSpawnerSettings, fishSpawnerSettings, grassSpawnerSettings, headbuttSpawnerSettings, naturalSpawnerSettings, rockSmashSpawnerSettings, surfSpawnerSettings);
                 a.create();
 
                 //AreaManager.areaConfigManager.put(area, bcm);
+
+                List<String> caveSpawns = bcm.getConfigNode(0, "Cave-Spawns").getList(TypeToken.of(String.class));
+                ComplexConfigManager ccm = new ComplexConfigManager(caveSpawns, "cave-spawns", "caveSpawnTemplate.conf", dir, SpawnManager.class, SpawnManager.MOD_NAME, SpawnManager.MOD_ID, SpawnManager.logger);
+                ccm.init();
+                List<CaveSpawn> caveSpawnList = new ArrayList<>();
+                for (int i = 0; i < caveSpawns.size(); i++) {
+
+                    String species = ccm.getConfigNode(i, "Pokemon-Data", "Species").getString();
+                    String form = ccm.getConfigNode(i, "Pokemon-Data", "Form").getString();
+                    int minLevel = ccm.getConfigNode(i, "Pokemon-Data", "Min-Level").getInt();
+                    int maxLevel = ccm.getConfigNode(i, "Pokemon-Data", "Max-Level").getInt();
+                    Map<String, Map<String, Map<String, String>>> spawnData = ccm.getConfigNode(i, "Spawn-Data").getValue(new TypeToken<Map<String, Map<String, Map<String, String>>>>() {});
+
+                    CaveSpawn caveSpawn = new CaveSpawn(species, form, minLevel, maxLevel, spawnData);
+                    caveSpawnList.add(caveSpawn);
+
+                }
 
                 List<String> fishSpawns = bcm.getConfigNode(0, "Fish-Spawns").getList(TypeToken.of(String.class));
                 ComplexConfigManager fcm = new ComplexConfigManager(fishSpawns, "fish-spawns", "fishSpawnTemplate.conf", dir, SpawnManager.class, SpawnManager.MOD_NAME, SpawnManager.MOD_ID, SpawnManager.logger);
@@ -210,7 +255,7 @@ public class SpawnAreaHandler {
 
                 }
 
-                AreaSpawns spawns = new AreaSpawns(a, fishSpawnsList, grassSpawnsList, headbuttSpawnsList, naturalSpawnsList, rockSmashSpawnsList, surfSpawnsList);
+                AreaSpawns spawns = new AreaSpawns(a, caveSpawnList, fishSpawnsList, grassSpawnsList, headbuttSpawnsList, naturalSpawnsList, rockSmashSpawnsList, surfSpawnsList);
                 areaSpawnMap.put(a, spawns);
 
             }

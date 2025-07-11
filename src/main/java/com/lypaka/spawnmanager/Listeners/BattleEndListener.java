@@ -93,6 +93,10 @@ public class BattleEndListener {
 
                         spawner = "Surf";
 
+                    } else if (CaveSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+
+                        spawner = "Cave";
+
                     }
                     if (spawner == null) return Unit.INSTANCE;
                     SpawnArea areaSpawns = SpawnAreaHandler.areaMap.get(currentArea);
@@ -235,6 +239,29 @@ public class BattleEndListener {
                             }
                             break;
 
+                        case "Cave":
+                            if (areaSpawns.getCaveSpawnerSettings().doesDespawnAfterBattle()) {
+
+                                CaveSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+
+                                    if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+
+                                        if (!ent.isBattling()) {
+
+                                            ent.remove(Entity.RemovalReason.DISCARDED);
+
+                                        }
+                                        return true;
+
+                                    }
+
+                                    return false;
+
+                                });
+
+                            }
+                            break;
+
                     }
 
                 }
@@ -309,6 +336,10 @@ public class BattleEndListener {
                         } else if (SurfSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
 
                             spawner = "Surf";
+
+                        } else if (CaveSpawner.spawnedPokemonUUIDs.contains(ent.getUuid())) {
+
+                            spawner = "Cave";
 
                         }
                         if (spawner == null) return Unit.INSTANCE;
@@ -433,6 +464,29 @@ public class BattleEndListener {
                                 if (areaSpawns.getSurfSpawnerSettings().doesDespawnAfterBattle()) {
 
                                     SurfSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
+
+                                        if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
+
+                                            if (!ent.isBattling()) {
+
+                                                ent.remove(Entity.RemovalReason.DISCARDED);
+
+                                            }
+                                            return true;
+
+                                        }
+
+                                        return false;
+
+                                    });
+
+                                }
+                                break;
+
+                            case "Cave":
+                                if (areaSpawns.getCaveSpawnerSettings().doesDespawnAfterBattle()) {
+
+                                    CaveSpawner.spawnedPokemonUUIDs.removeIf(entry -> {
 
                                         if (entry.toString().equalsIgnoreCase(ent.getUuid().toString())) {
 

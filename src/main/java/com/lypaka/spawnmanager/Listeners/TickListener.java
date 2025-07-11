@@ -11,6 +11,8 @@ public class TickListener implements ServerTickEvents.EndTick {
 
     private static int tickCount = 0;
     public static Map<UUID, Integer> timeBetweenGrassSpawns = new HashMap<>();
+    public static Map<UUID, Integer> timeBetweenCaveSpawns = new HashMap<>();
+    public static Map<UUID, Integer> timeBetweenSurfSpawns = new HashMap<>();
 
     @Override
     public void onEndTick (MinecraftServer minecraftServer) {
@@ -19,6 +21,38 @@ public class TickListener implements ServerTickEvents.EndTick {
         if (tickCount < 20) return;
         tickCount = 0;
         timeBetweenGrassSpawns.entrySet().removeIf(entry -> {
+
+            int count = entry.getValue();
+            count++;
+            if (count >= 2) {
+
+                return true;
+
+            } else {
+
+                entry.setValue(count);
+                return false;
+
+            }
+
+        });
+        timeBetweenCaveSpawns.entrySet().removeIf(entry -> {
+
+            int count = entry.getValue();
+            count++;
+            if (count >= 2) {
+
+                return true;
+
+            } else {
+
+                entry.setValue(count);
+                return false;
+
+            }
+
+        });
+        timeBetweenSurfSpawns.entrySet().removeIf(entry -> {
 
             int count = entry.getValue();
             count++;
